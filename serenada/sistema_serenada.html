@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Serenada Pub & Burger - Sistema</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#121212;
+    color:#fff;
+}
+
+.container{
+    max-width:1100px;
+    margin:30px auto;
+    background:#1e1e1e;
+    padding:25px;
+    border-radius:12px;
+}
+
+h1{
+    text-align:center;
+}
+
+.section{
+    margin-top:30px;
+    padding:15px;
+    background:#2a2a2a;
+    border-radius:10px;
+}
+
+input, select{
+    padding:6px;
+    margin:5px;
+}
+
+button{
+    padding:6px 10px;
+    margin:5px;
+    cursor:pointer;
+    border:none;
+    border-radius:6px;
+}
+
+.btn-primary{ background:#03dac6; }
+.btn-danger{ background:#ff5252; color:#fff; }
+.btn-close{ background:#ff4081; color:#fff; }
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+th, td{
+    border-bottom:1px solid #444;
+    padding:6px;
+    text-align:center;
+}
+
+.total{
+    font-weight:bold;
+    margin-top:10px;
+}
+</style>
+</head>
+<body>
+<div id="loginScreen" style="
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#121212;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    z-index:9999;
+">
+    <h2>🔐 Acesso ao Sistema</h2>
+    <input type="password" id="senhaLogin" placeholder="Digite a senha">
+    <button onclick="fazerLogin()">Entrar</button>
+</div>
+<div class="container">
+
+<h1>Serenada Pub & Burger</h1>
+
+<!-- ESTOQUE -->
+<div class="section">
+<h3>📦 Cadastro de Produtos / Estoque</h3>
+
+<input id="nomeProduto" placeholder="Produto">
+<input id="precoProduto" type="number" step="0.01" placeholder="Preço">
+<input id="estoqueProduto" type="number" placeholder="Estoque">
+
+<button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
+
+<table>
+<thead>
+<tr>
+<th>Produto</th><th>Preço</th><th>Estoque</th>
+</tr>
+</thead>
+<tbody id="tabelaEstoque"></tbody>
+</table>
+</div>
+
+<!-- COMANDAS -->
+<div class="section">
+<h3>🔥 Comandas</h3>
+
+<select id="mesaSelect"></select>
+
+<select id="produtoSelect"></select>
+
+<input type="number" id="qtdItem" placeholder="Qtd">
+
+<button class="btn-primary" onclick="adicionarItem()">Adicionar</button>
+
+<table>
+<thead>
+<tr>
+<th>Produto</th><th>Qtd</th><th>Total</th>
+</tr>
+</thead>
+<tbody id="itensMesa"></tbody>
+</table>
+
+<div class="total" id="totalMesa"></div>
+
+<button class="btn-close" onclick="fecharMesa()">Fechar Mesa</button>
+</div>
+
+<!-- CAIXA -->
+<div class="section">
+<h3>💰 Caixa do Dia</h3>
+
+<div id="totalDia">Total do Dia: R$ 0.00</div>
+
+<button class="btn-danger" onclick="fecharCaixa()">Fechar Caixa</button>
+<button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório do Dia</button>
+<button class="btn-primary" onclick="gerarRelatorioMensal()">📈 Relatório Mensal</button>
+</div>
+
+
+<script>
+//const senhaCaixa = "1234"; // você pode alterar
+
+let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
+let comandas = JSON.parse(localStorage.getItem("comandas")) || {};
+let totalDia = JSON.parse(localStorage.getItem("totalDia")) || 0;
+
+//function fazerLogin(){
+  //  let senha = document.getElementById("senhaLogin").value;
+
+   // if(senha === senhaCaixa){
+        document.getElementById("loginScreen").style.display="none";
+    //} else {
+   //     alert("Senha incorreta!");
+   // }
+//}
+
+function salvarDados(){
+    localStorage.setItem("estoque", JSON.stringify(estoque));
+    localStorage.setItem("comandas", JSON.stringify(comandas));
+    localStorage.setItem("totalDia", JSON.stringify(totalDia));
+}
+
+function cadastrarProduto(){
+
+    let nome = nomeProduto.value.trim();
+    let preco = parseFloat(precoProduto.value);
+    let qtd = parseInt(estoqueProduto.value);
+
+    if(!nome || isNaN(preco) || isNaN(qtd)){
+        return alert("Preencha todos os campos corretamente.");
+    }
+
+    // Verifica se já existe produto com mesmo nome
+    let produtoExistente = estoque.find(p => 
+        p.nome.toLowerCase() === nome.toLowerCase()
+    );
+
+    if(produtoExistente){
+        return alert("⚠ Produto já cadastrado!");
+    }
+
+    estoque.push({nome, preco, qtd});
+
+    salvarDados();
+    atualizarEstoque();
+
+    nomeProduto.value = "";
+    precoProduto.value = "";
+    estoqueProduto.value = "";
+}
+
+
+function atualizarEstoque(){
+
+    tabelaEstoque.innerHTML="";
+    produtoSelect.innerHTML="";
+
+    estoque.forEach((p,i)=>{
+
+        tabelaEstoque.innerHTML+=
+        `<tr>
+            <td>${p.nome}</td>
+            <td>R$ ${p.preco.toFixed(2)}</td>
+            <td>
+                <button onclick="alterarEstoque(${i}, -1)">➖</button>
+                ${p.qtd}
+                <button onclick="alterarEstoque(${i}, 1)">➕</button>
+            </td>
+        </tr>`;
+
+        produtoSelect.innerHTML+=
+        `<option value="${i}">${p.nome}</option>`;
+    });
+}
+function alterarEstoque(index, quantidade){
+
+    let produto = estoque[index];
+
+    produto.qtd += quantidade;
+
+    if(produto.qtd < 0){
+        produto.qtd = 0;
+    }
+
+    salvarDados();
+    atualizarEstoque();
+}
+
+function atualizarMesas(){
+    mesaSelect.innerHTML="";
+    mesaSelect.innerHTML+=`<option value="todas">Todas as Mesas</option>`;
+
+    for(let i=1;i<=20;i++){
+        mesaSelect.innerHTML+=`<option value="${i}">Mesa ${i}</option>`;
+    }
+}
+
+function adicionarItem(){
+    let mesa = mesaSelect.value;
+    if(mesa==="todas") return alert("Selecione uma mesa específica");
+
+    let produtoIndex = produtoSelect.value;
+    let qtd = parseInt(qtdItem.value);
+
+    let produto = estoque[produtoIndex];
+
+    if(produto.qtd < qtd) return alert("Estoque insuficiente");
+
+    if(!comandas[mesa]) comandas[mesa]=[];
+
+    let total = produto.preco * qtd;
+
+    comandas[mesa].push({
+        nome:produto.nome,
+        qtd,
+        preco:produto.preco,
+        total
+    });
+
+    produto.qtd -= qtd;
+
+    salvarDados();
+    atualizarEstoque();
+    atualizarMesa();
+}
+
+function atualizarMesa(){
+    let mesa = mesaSelect.value;
+    itensMesa.innerHTML="";
+    let total=0;
+
+    if(mesa==="todas"){
+        for(let m in comandas){
+            itensMesa.innerHTML+=
+            `<tr><td colspan="4"><b>Mesa ${m}</b></td></tr>`;
+            
+            comandas[m].forEach((item,index)=>{
+                total+=item.total;
+                itensMesa.innerHTML+=
+                `<tr>
+                    <td>${item.nome}</td>
+                    <td>${item.qtd}</td>
+                    <td>R$ ${item.total.toFixed(2)}</td>
+                    <td></td>
+                </tr>`;
+            });
+        }
+        totalMesa.innerHTML="Total Geral em Aberto: R$ "+total.toFixed(2);
+        return;
+    }
+
+    if(comandas[mesa]){
+        comandas[mesa].forEach((item,index)=>{
+            total+=item.total;
+            itensMesa.innerHTML+=
+            `<tr>
+                <td>${item.nome}</td>
+                <td>${item.qtd}</td>
+                <td>R$ ${item.total.toFixed(2)}</td>
+                    <td>
+                     <button onclick="removerUmaUnidade('${mesa}',${index})">➖</button>
+                     <button onclick="removerItem('${mesa}',${index})">❌</button>
+                    </td>
+            </tr>`;
+        });
+    }
+
+    totalMesa.innerHTML="Total Mesa: R$ "+total.toFixed(2);
+}
+
+function removerItem(mesa,index){
+    let item = comandas[mesa][index];
+
+    let produto = estoque.find(p=>p.nome===item.nome);
+    if(produto){
+        produto.qtd += item.qtd;
+    }
+
+    comandas[mesa].splice(index,1);
+
+    if(comandas[mesa].length===0){
+        delete comandas[mesa];
+    }
+
+    salvarDados();
+    atualizarEstoque();
+    atualizarMesa();
+}
+
+function removerUmaUnidade(mesa, index){
+
+    let item = comandas[mesa][index];
+
+    // devolve 1 unidade ao estoque
+    let produto = estoque.find(p => p.nome === item.nome);
+    if(produto){
+        produto.qtd += 1;
+    }
+
+    // reduz quantidade do item
+    item.qtd -= 1;
+    item.total = item.qtd * item.preco;
+
+    // se quantidade zerar, remove o item inteiro
+    if(item.qtd <= 0){
+        comandas[mesa].splice(index,1);
+    }
+
+    // se a mesa ficar vazia, remove a mesa
+    if(comandas[mesa] && comandas[mesa].length === 0){
+        delete comandas[mesa];
+    }
+
+    salvarDados();
+    atualizarEstoque();
+    atualizarMesa();
+}
+
+
+mesaSelect.addEventListener("change", atualizarMesa);
+
+function fecharMesa(){
+
+    let mesa = mesaSelect.value;
+
+    if(mesa==="todas") return alert("Selecione uma mesa específica");
+
+    if(!comandas[mesa]) return alert("Mesa vazia");
+
+    let pagamento = prompt("Forma de pagamento:\n1 - Dinheiro\n2 - Pix\n3 - Crédito\n4 - Débito");
+
+    let formaPagamento = "";
+
+    switch(pagamento){
+        case "1": formaPagamento="Dinheiro"; break;
+        case "2": formaPagamento="Pix"; break;
+        case "3": formaPagamento="Crédito"; break;
+        case "4": formaPagamento="Débito"; break;
+        default: return alert("Forma inválida");
+    }
+
+    let total = comandas[mesa].reduce((s,i)=>s+i.total,0);
+
+    let agora = new Date();
+
+    let registro = {
+        mesa,
+        itens: comandas[mesa],
+        total,
+        formaPagamento,
+        data: agora.toISOString()
+    };
+
+    let historico = JSON.parse(localStorage.getItem("historico")) || [];
+    historico.push(registro);
+    localStorage.setItem("historico", JSON.stringify(historico));
+
+    totalDia+=total;
+
+    imprimirCupom(mesa, comandas[mesa], total);
+
+    delete comandas[mesa];
+
+    salvarDados();
+    atualizarMesa();
+    atualizarTotalDia();
+}
+
+
+function atualizarTotalDia(){
+    totalDiaDiv = document.getElementById("totalDia");
+    totalDiaDiv.innerHTML="Total do Dia: R$ "+totalDia.toFixed(2);
+}
+
+function fecharCaixa(){
+
+    if(totalDia === 0){
+        return alert("Não há valores para fechar no caixa.");
+    }
+
+    let agora = new Date();
+
+    let dataFormatada =
+        agora.toLocaleDateString("pt-BR") + " " +
+        agora.toLocaleTimeString("pt-BR");
+
+    let relatorio = "SERENADA PUB & BURGER\n";
+    relatorio += "RELATÓRIO DE FECHAMENTO DE CAIXA\n";
+    relatorio += "----------------------------------\n";
+    relatorio += "Data e Hora: " + dataFormatada + "\n\n";
+    relatorio += "Total do Dia: R$ " + totalDia.toFixed(2) + "\n";
+    relatorio += "----------------------------------\n";
+    relatorio += "Fechamento realizado com sucesso.\n";
+
+    // gerar arquivo txt
+    let blob = new Blob([relatorio], { type: "text/plain" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "fechamento_caixa_" + agora.getTime() + ".txt";
+    link.click();
+
+    alert("Caixa fechado com sucesso!\nTotal: R$ " + totalDia.toFixed(2));
+
+    totalDia = 0;
+    salvarDados();
+    atualizarTotalDia();
+}
+
+function imprimirCupom(mesa, itens, total){
+    let janela = window.open("", "", "width=300,height=600");
+
+    let conteudo = `
+    <pre>
+SERENADA PUB & BURGER
+Mesa: ${mesa}
+--------------------------
+`;
+
+    itens.forEach(i=>{
+        conteudo+=`${i.nome}
+${i.qtd} x ${i.preco.toFixed(2)} = ${i.total.toFixed(2)}
+`;
+    });
+
+    conteudo+=`
+--------------------------
+TOTAL: R$ ${total.toFixed(2)}
+
+Obrigado pela preferência!
+    </pre>
+    `;
+
+    janela.document.write(conteudo);
+    janela.print();
+    janela.close();
+}
+
+atualizarEstoque();
+atualizarMesas();
+atualizarTotalDia();
+
+function gerarRelatorioMensal(){
+
+    let historico = JSON.parse(localStorage.getItem("historico")) || [];
+    let agora = new Date();
+    let mesAtual = agora.getMonth();
+    let anoAtual = agora.getFullYear();
+
+    let totalMes = 0;
+
+    historico.forEach(reg=>{
+        let data = new Date(reg.data);
+
+        if(data.getMonth()===mesAtual && data.getFullYear()===anoAtual){
+            totalMes+=reg.total;
+        }
+    });
+
+    alert("Total acumulado no mês: R$ "+totalMes.toFixed(2));
+}
+
+function gerarRelatorioCompleto(){
+
+    let historico = JSON.parse(localStorage.getItem("historico")) || [];
+    let hoje = new Date().toLocaleDateString("pt-BR");
+
+    let texto = "RELATÓRIO COMPLETO DO DIA\n\n";
+
+    historico.forEach(reg=>{
+        let dataReg = new Date(reg.data).toLocaleDateString("pt-BR");
+
+        if(dataReg === hoje){
+            texto += "Mesa: " + reg.mesa + "\n";
+            texto += "Pagamento: " + reg.formaPagamento + "\n";
+
+            reg.itens.forEach(i=>{
+                texto += i.nome + " - " + i.qtd + " - R$ " + i.total.toFixed(2) + "\n";
+            });
+
+            texto += "Total: R$ " + reg.total.toFixed(2) + "\n";
+            texto += "-------------------------\n";
+        }
+    });
+
+    let blob = new Blob([texto], { type: "text/plain" });
+    let link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "relatorio_dia.txt";
+    link.click();
+}
+if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("sw.js");
+}
+
+</script>
+
+
+</body>
+</html>

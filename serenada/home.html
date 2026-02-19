@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serenada Pub & Burger</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    height:100vh;
+    background:linear-gradient(-45deg,#3b1c4a,#2a1235,#4a245c,#1e0d27);
+    background-size:400% 400%;
+    animation:gradientMove 10s ease infinite;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:hidden;
+    color:#fff;
+}
+
+@keyframes gradientMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+/* PARTÍCULAS */
+body::before{
+    content:"";
+    position:absolute;
+    width:200%;
+    height:200%;
+    background-image:radial-gradient(#00ff9955 1px, transparent 1px);
+    background-size:40px 40px;
+    animation:moveParticles 20s linear infinite;
+}
+
+@keyframes moveParticles{
+    from{transform:translate(0,0);}
+    to{transform:translate(-200px,-200px);}
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    z-index:2;
+}
+
+/* LADO ESQUERDO */
+
+.left{
+    width:55%;
+    animation:fadeInLeft 1s ease forwards;
+}
+
+@keyframes fadeInLeft{
+    from{opacity:0; transform:translateX(-50px);}
+    to{opacity:1; transform:translateX(0);}
+}
+
+.left h1{
+    font-size:56px;
+    line-height:1.2;
+    color:#7fffd4;
+    text-shadow:0 0 10px #00ff99, 0 0 20px #00ff99;
+}
+
+.left span{
+    color:#00ff99;
+}
+
+.left p{
+    margin-top:20px;
+    font-size:20px;
+    color:#ccc;
+}
+
+/* CARD DIREITO */
+
+.right-card{
+    width:420px;
+    background:rgba(74,36,92,0.85);
+    padding:45px;
+    border-radius:20px;
+    backdrop-filter:blur(15px);
+    box-shadow:0 0 40px rgba(0,255,153,0.2);
+    animation:fadeInRight 1s ease forwards;
+}
+
+@keyframes fadeInRight{
+    from{opacity:0; transform:translateX(50px);}
+    to{opacity:1; transform:translateX(0);}
+}
+
+.right-card h2{
+    text-align:center;
+    margin-bottom:30px;
+    color:#00ff99;
+    letter-spacing:3px;
+}
+
+/* BOTÕES */
+
+.btn{
+    width:100%;
+    padding:16px;
+    margin-bottom:18px;
+    border:none;
+    border-radius:12px;
+    font-weight:bold;
+    letter-spacing:2px;
+    cursor:pointer;
+    transition:0.3s;
+    font-size:15px;
+}
+
+.btn-primary{
+    background:#00ff99;
+    color:#000;
+    box-shadow:0 0 15px #00ff99;
+}
+
+.btn-primary:hover{
+    background:#00cc77;
+    box-shadow:0 0 25px #00ff99;
+    transform:scale(1.03);
+}
+
+.btn-secondary{
+    background:#5a2e6e;
+    color:#fff;
+}
+
+.btn-secondary:hover{
+    background:#6d3d85;
+    transform:scale(1.03);
+}
+
+/* RESPONSIVO */
+
+@media(max-width:950px){
+    .container{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .left{
+        width:100%;
+        margin-bottom:40px;
+    }
+
+    .right-card{
+        width:100%;
+        max-width:420px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <div class="left">
+        <h1>Bem-vindo ao<br><span>Serenada Pub & Burger</span></h1>
+        <p>Sistema inteligente para comandas, estoque e controle de caixa.</p>
+    </div>
+
+    <div class="right-card">
+        <h2>ACESSO</h2>
+
+        <button class="btn btn-primary" onclick="irLogin()">LOGIN</button>
+        <button class="btn btn-secondary" onclick="irSistema()">ENTRAR DIRETO</button>
+    </div>
+
+</div>
+
+<script>
+function irLogin(){
+    window.location.href = "login.html";
+}
+
+function irSistema(){
+    window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>

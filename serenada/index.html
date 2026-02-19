@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6a0dad">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serenada Pub & Burger</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:#2b0f3a;
+    color:#fff;
+    overflow-x:hidden;
+}
+
+/* HEADER */
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 8%;
+}
+
+.logo{
+    font-weight:bold;
+    font-size:22px;
+    color:#d9aaff;
+}
+
+nav a{
+    text-decoration:none;
+    color:#fff;
+    margin:0 15px;
+    font-size:15px;
+    transition:0.3s;
+}
+
+nav a:hover{
+    color:#d9aaff;
+}
+
+.search{
+    padding:6px 12px;
+    border-radius:20px;
+    border:none;
+    outline:none;
+}
+
+/* HERO */
+
+.hero{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:60px 8%;
+    position:relative;
+}
+
+/* FUNDO DECORATIVO */
+
+.hero::before{
+    content:"";
+    position:absolute;
+    left:-150px;
+    top:50px;
+    width:600px;
+    height:600px;
+    background:#5e1a82;
+    border-radius:50%;
+    z-index:0;
+}
+
+.hero-content{
+    width:50%;
+    z-index:2;
+}
+
+.hero-content h1{
+    font-size:64px;
+    line-height:1.1;
+    color:#e4b8ff;
+}
+
+.hero-content p{
+    margin:20px 0;
+    color:#ccc;
+    font-size:18px;
+}
+
+.btn{
+    padding:12px 25px;
+    border:none;
+    border-radius:25px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.btn-primary{
+    background:#b84dff;
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:#9a2fff;
+    transform:scale(1.05);
+}
+
+/* IMAGEM */
+
+.hero-image{
+    width:45%;
+    z-index:2;
+    text-align:center;
+}
+
+.hero-image img{
+    width:100%;
+    max-width:500px;
+    filter:drop-shadow(0 0 25px rgba(184,77,255,0.6));
+}
+
+/* RESPONSIVO */
+
+@media(max-width:900px){
+    .hero{
+        flex-direction:column;
+        text-align:center;
+    }
+
+    .hero-content, .hero-image{
+        width:100%;
+    }
+
+    .hero::before{
+        width:400px;
+        height:400px;
+        left:-100px;
+    }
+
+    .hero-content h1{
+        font-size:42px;
+    }
+}
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo">Serenada</div>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="#">Menu</a>
+        <a href="#">Pedidos</a>
+        <a href="#">Contato</a>
+    </nav>
+
+    <input class="search" placeholder="Buscar...">
+</header>
+
+<section class="hero">
+
+    <div class="hero-content">
+        <h1>Serenada<br>Pub Burguer</h1>
+        <p>O melhor hambúrguer artesanal da cidade. Sabor único, ingredientes selecionados e experiência premium.</p>
+        <button class="btn btn-primary">PEÇA AGORA</button>
+    </div>
+
+    <div class="hero-image">
+        <!-- Coloque aqui a imagem do seu burger -->
+        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349" alt="Burger">
+    </div>
+
+</section>
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+    .then(() => console.log("PWA ativo 🚀"))
+    .catch(err => console.log("Erro SW:", err));
+}
+</script>
+</body>
+</html>
