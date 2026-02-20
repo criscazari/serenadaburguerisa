@@ -2,19 +2,21 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Serenada Pub & Burger - Sistema</title>
 
 <style>
 body{
     margin:0;
+    padding:16px;
     font-family:Arial;
     background:#121212;
     color:#fff;
 }
 
 .container{
-    max-width:1100px;
-    margin:30px auto;
+    width:min(100%,1100px);
+    margin:16px auto;
     background:#1e1e1e;
     padding:25px;
     border-radius:12px;
@@ -32,12 +34,14 @@ h1{
 }
 
 input, select{
-    padding:6px;
+    width:100%;
+    max-width:230px;
+    padding:8px;
     margin:5px;
 }
 
 button{
-    padding:6px 10px;
+    padding:8px 12px;
     margin:5px;
     cursor:pointer;
     border:none;
@@ -48,8 +52,14 @@ button{
 .btn-danger{ background:#ff5252; color:#fff; }
 .btn-close{ background:#ff4081; color:#fff; }
 
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
 table{
     width:100%;
+    min-width:430px;
     border-collapse:collapse;
     margin-top:10px;
 }
@@ -64,6 +74,31 @@ th, td{
     font-weight:bold;
     margin-top:10px;
 }
+
+@media(max-width:720px){
+    body{
+        padding:10px;
+    }
+
+    .container{
+        padding:16px;
+    }
+
+    .section{
+        padding:12px;
+    }
+
+    input, select, button{
+        width:100%;
+        max-width:none;
+        margin:5px 0;
+    }
+
+    h1{
+        font-size:24px;
+    }
+}
+
 </style>
 </head>
 <body>
@@ -98,6 +133,7 @@ th, td{
 
 <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
 
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
@@ -106,6 +142,7 @@ th, td{
 </thead>
 <tbody id="tabelaEstoque"></tbody>
 </table>
+</div>
 </div>
 
 <!-- COMANDAS -->
@@ -120,6 +157,7 @@ th, td{
 
 <button class="btn-primary" onclick="adicionarItem()">Adicionar</button>
 
+<div class="table-wrap">
 <table>
 <thead>
 <tr>
@@ -128,6 +166,7 @@ th, td{
 </thead>
 <tbody id="itensMesa"></tbody>
 </table>
+</div>
 
 <div class="total" id="totalMesa"></div>
 
