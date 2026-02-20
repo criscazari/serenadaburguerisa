@@ -14,14 +14,14 @@
 }
 
 body{
-    height:100vh;
+    min-height:100vh;
     background:linear-gradient(-45deg,#3b1c4a,#2a1235,#4a245c,#1e0d27);
     background-size:400% 400%;
     animation:gradientMove 10s ease infinite;
     display:flex;
     justify-content:center;
     align-items:center;
-    overflow:hidden;
+    overflow-x:hidden;
     color:#fff;
 }
 
@@ -149,6 +149,10 @@ body::before{
 /* RESPONSIVO */
 
 @media(max-width:950px){
+    body{
+        padding:24px 0;
+    }
+
     .container{
         flex-direction:column;
         text-align:center;
@@ -162,6 +166,20 @@ body::before{
     .right-card{
         width:100%;
         max-width:420px;
+    }
+}
+
+@media(max-width:560px){
+    .left h1{
+        font-size:38px;
+    }
+
+    .left p{
+        font-size:17px;
+    }
+
+    .right-card{
+        padding:28px 22px;
     }
 }
 </style>
