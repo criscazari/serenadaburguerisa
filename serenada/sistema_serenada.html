@@ -7,7 +7,7 @@
 <style>
 body{
     margin:0;
-    font-family:Arial;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:#121212;
     color:#fff;
 }
@@ -18,10 +18,13 @@ body{
     background:#1e1e1e;
     padding:25px;
     border-radius:12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 h1{
     text-align:center;
+    color: #03dac6;
+    letter-spacing: 2px;
 }
 
 .section{
@@ -32,21 +35,33 @@ h1{
 }
 
 input, select{
-    padding:6px;
+    padding:10px;
     margin:5px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #333;
+    color: #fff;
+    outline: none;
 }
 
+input:focus { border-color: #03dac6; }
+
 button{
-    padding:6px 10px;
+    padding:10px 15px;
     margin:5px;
     cursor:pointer;
     border:none;
     border-radius:6px;
+    font-weight: bold;
+    transition: 0.2s;
 }
 
-.btn-primary{ background:#03dac6; }
+button:hover { opacity: 0.8; transform: translateY(-1px); }
+
+.btn-primary{ background:#03dac6; color: #000; }
 .btn-danger{ background:#ff5252; color:#fff; }
 .btn-close{ background:#ff4081; color:#fff; }
+.btn-warning { background: #ffb100; color: #000; }
 
 table{
     width:100%;
@@ -56,112 +71,129 @@ table{
 
 th, td{
     border-bottom:1px solid #444;
-    padding:6px;
+    padding:12px;
     text-align:center;
 }
 
+th { background: #333; color: #03dac6; }
+
 .total{
     font-weight:bold;
-    margin-top:10px;
+    margin-top:15px;
+    font-size: 1.4em;
+    color: #03dac6;
+    text-align: right;
+}
+
+.obs-text {
+    font-size: 0.85em;
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Escondido por padrão */
+#painelDelivery { 
+    display: none; 
+    border-left: 4px solid #03dac6;
+    padding-left: 10px;
+    margin: 10px 0;
 }
 </style>
 </head>
 <body>
-<div id="loginScreen" style="
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:#121212;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    z-index:9999;
-">
-    <h2>🔐 Acesso ao Sistema</h2>
-    <input type="password" id="senhaLogin" placeholder="Digite a senha">
-    <button onclick="fazerLogin()">Entrar</button>
+
+<div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999;">
+    <h2 style="color:#03dac6">🍔 Serenada Pub - Acesso</h2>
+    <input type="password" id="senhaLogin" placeholder="Senha do Sistema" style="text-align:center; font-size:1.2em">
+    <button class="btn-primary" onclick="fazerLogin()" style="width:200px">Entrar</button>
 </div>
+
 <div class="container">
+    <h1>SERENADA PUB & BURGER</h1>
 
-<h1>Serenada Pub & Burger</h1>
+    <div class="section">
+        <h3>📦 Cadastro de Estoque</h3>
+        <input id="nomeProduto" placeholder="Nome do Produto">
+        <input id="precoProduto" type="number" step="0.01" min="0.01" placeholder="Preço (ex: 25.50)">
+        <input id="estoqueProduto" type="number" min="0" placeholder="Qtd Inicial">
+        <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
 
-<!-- ESTOQUE -->
-<div class="section">
-<h3>📦 Cadastro de Produtos / Estoque</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaEstoque"></tbody>
+        </table>
+    </div>
 
-<input id="nomeProduto" placeholder="Produto">
-<input id="precoProduto" type="number" step="0.01" placeholder="Preço">
-<input id="estoqueProduto" type="number" placeholder="Estoque">
+    <div class="section">
+        <h3>🔥 Lançar Pedido</h3>
+        <div style="display: flex; flex-wrap: wrap; align-items: center;">
+            <select id="mesaSelect" onchange="toggleCliente()">
+                </select>
 
-<button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
+            <div id="painelDelivery">
+                <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+                <input type="text" id="endCliente" placeholder="Endereço Completo" style="width: 250px;">
+                <input type="number" id="taxaEntrega" placeholder="Taxa Entrega R$" min="0" step="0.50" style="width: 120px;">
+            </div>
+        </div>
 
-<table>
-<thead>
-<tr>
-<th>Produto</th><th>Preço</th><th>Estoque</th>
-</tr>
-</thead>
-<tbody id="tabelaEstoque"></tbody>
-</table>
+        <div style="margin-top:10px;">
+            <select id="produtoSelect"></select>
+            <input type="number" id="qtdItem" value="1" min="1" style="width: 70px;">
+            <input type="text" id="obsItem" placeholder="Obs: Sem cebola, mal passado..." style="width: 250px;">
+            <button class="btn-primary" onclick="adicionarItem()">Adicionar na Conta</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Local/Cliente</th>
+                    <th>Produto</th>
+                    <th>Obs</th>
+                    <th>Qtd</th>
+                    <th>Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="itensMesa"></tbody>
+        </table>
+
+        <div class="total" id="totalMesa">Total: R$ 0.00</div>
+        <button class="btn-close" onclick="fecharMesa()">Finalizar e Imprimir Cupom</button>
+    </div>
+
+    <div class="section" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3>💰 Caixa do Dia</h3>
+            <div id="totalDia" style="font-size: 1.8em; color: #03dac6;">Total: R$ 0.00</div>
+        </div>
+        <div>
+            <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+            <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
+            <button class="btn-warning" onclick="zerarSistema()">⚠️ Zerar Tudo</button>
+        </div>
+    </div>
 </div>
-
-<!-- COMANDAS -->
-<div class="section">
-<h3>🔥 Comandas</h3>
-
-<select id="mesaSelect"></select>
-
-<select id="produtoSelect"></select>
-
-<input type="number" id="qtdItem" placeholder="Qtd">
-
-<button class="btn-primary" onclick="adicionarItem()">Adicionar</button>
-
-<table>
-<thead>
-<tr>
-<th>Produto</th><th>Qtd</th><th>Total</th>
-</tr>
-</thead>
-<tbody id="itensMesa"></tbody>
-</table>
-
-<div class="total" id="totalMesa"></div>
-
-<button class="btn-close" onclick="fecharMesa()">Fechar Mesa</button>
-</div>
-
-<!-- CAIXA -->
-<div class="section">
-<h3>💰 Caixa do Dia</h3>
-
-<div id="totalDia">Total do Dia: R$ 0.00</div>
-
-<button class="btn-danger" onclick="fecharCaixa()">Fechar Caixa</button>
-<button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório do Dia</button>
-<button class="btn-primary" onclick="gerarRelatorioMensal()">📈 Relatório Mensal</button>
-</div>
-
 
 <script>
-//const senhaCaixa = "1234"; // você pode alterar
+const SENHA_SISTEMA = "1234"; // Altere aqui se desejar
 
 let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
 let comandas = JSON.parse(localStorage.getItem("comandas")) || {};
 let totalDia = JSON.parse(localStorage.getItem("totalDia")) || 0;
 
-//function fazerLogin(){
-  //  let senha = document.getElementById("senhaLogin").value;
-
-   // if(senha === senhaCaixa){
+function fazerLogin(){
+    if(document.getElementById("senhaLogin").value === SENHA_SISTEMA) {
         document.getElementById("loginScreen").style.display="none";
-    //} else {
-   //     alert("Senha incorreta!");
-   // }
-//}
+    } else alert("Senha incorreta!");
+}
 
 function salvarDados(){
     localStorage.setItem("estoque", JSON.stringify(estoque));
@@ -169,380 +201,237 @@ function salvarDados(){
     localStorage.setItem("totalDia", JSON.stringify(totalDia));
 }
 
-function cadastrarProduto(){
+function toggleCliente() {
+    let mesa = mesaSelect.value;
+    document.getElementById("painelDelivery").style.display = (mesa === "Delivery") ? "flex" : "none";
+    atualizarMesa();
+}
 
+function cadastrarProduto(){
     let nome = nomeProduto.value.trim();
     let preco = parseFloat(precoProduto.value);
     let qtd = parseInt(estoqueProduto.value);
 
-    if(!nome || isNaN(preco) || isNaN(qtd)){
-        return alert("Preencha todos os campos corretamente.");
+    if(!nome || isNaN(preco) || preco <= 0 || isNaN(qtd) || qtd < 0){
+        return alert("Preencha valores válidos e positivos!");
     }
 
-    // Verifica se já existe produto com mesmo nome
-    let produtoExistente = estoque.find(p => 
-        p.nome.toLowerCase() === nome.toLowerCase()
-    );
-
-    if(produtoExistente){
-        return alert("⚠ Produto já cadastrado!");
+    if(estoque.find(p => p.nome.toLowerCase() === nome.toLowerCase())) {
+        return alert("Produto já cadastrado!");
     }
 
     estoque.push({nome, preco, qtd});
-
     salvarDados();
     atualizarEstoque();
-
-    nomeProduto.value = "";
-    precoProduto.value = "";
-    estoqueProduto.value = "";
+    nomeProduto.value = ""; precoProduto.value = ""; estoqueProduto.value = "";
 }
 
-
 function atualizarEstoque(){
-
     tabelaEstoque.innerHTML="";
     produtoSelect.innerHTML="";
-
     estoque.forEach((p,i)=>{
-
         tabelaEstoque.innerHTML+=
         `<tr>
             <td>${p.nome}</td>
             <td>R$ ${p.preco.toFixed(2)}</td>
             <td>
                 <button onclick="alterarEstoque(${i}, -1)">➖</button>
-                ${p.qtd}
+                <strong>${p.qtd}</strong>
                 <button onclick="alterarEstoque(${i}, 1)">➕</button>
             </td>
+            <td><button class="btn-danger" onclick="excluirProduto(${i})">🗑️</button></td>
         </tr>`;
-
-        produtoSelect.innerHTML+=
-        `<option value="${i}">${p.nome}</option>`;
+        produtoSelect.innerHTML+= `<option value="${i}">${p.nome}</option>`;
     });
 }
-function alterarEstoque(index, quantidade){
 
-    let produto = estoque[index];
-
-    produto.qtd += quantidade;
-
-    if(produto.qtd < 0){
-        produto.qtd = 0;
-    }
-
+function alterarEstoque(i, n){
+    if(estoque[i].qtd + n < 0) return alert("Estoque insuficiente!");
+    estoque[i].qtd += n;
     salvarDados();
     atualizarEstoque();
 }
 
-function atualizarMesas(){
-    mesaSelect.innerHTML="";
-    mesaSelect.innerHTML+=`<option value="todas">Todas as Mesas</option>`;
-
-    for(let i=1;i<=20;i++){
-        mesaSelect.innerHTML+=`<option value="${i}">Mesa ${i}</option>`;
+function excluirProduto(i) {
+    if(confirm(`Excluir ${estoque[i].nome}?`)) {
+        estoque.splice(i, 1);
+        salvarDados();
+        atualizarEstoque();
     }
 }
 
+function atualizarMesas(){
+    mesaSelect.innerHTML = `<option value="todas">Ver Todas</option> <option value="Balcão">📍 Balcão</option> <option value="Delivery">🛵 Delivery</option>`;
+    for(let i=1;i<=20;i++) mesaSelect.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
+}
+
 function adicionarItem(){
-    let mesa = mesaSelect.value;
-    if(mesa==="todas") return alert("Selecione uma mesa específica");
+    let mesaSel = mesaSelect.value;
+    if(mesaSel==="todas") return alert("Selecione o destino do pedido");
 
-    let produtoIndex = produtoSelect.value;
+    let nomeCli = nomeCliente.value.trim();
+    let endereco = endCliente.value.trim();
+    let taxa = parseFloat(taxaEntrega.value) || 0;
+
+    if(mesaSel === "Delivery" && (!nomeCli || !endereco)) return alert("Para Delivery, nome e endereço são obrigatórios!");
+    if(taxa < 0) return alert("A taxa não pode ser negativa!");
+
+    let pIdx = produtoSelect.value;
     let qtd = parseInt(qtdItem.value);
+    let produto = estoque[pIdx];
 
-    let produto = estoque[produtoIndex];
+    if(!produto || qtd <= 0) return alert("Verifique o produto e a quantidade!");
+    if(produto.qtd < qtd) return alert("Estoque insuficiente!");
 
-    if(produto.qtd < qtd) return alert("Estoque insuficiente");
+    let id = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
 
-    if(!comandas[mesa]) comandas[mesa]=[];
+    if(!comandas[id]) {
+        comandas[id] = { itens: [], taxa: 0, endereco: "" };
+        if(mesaSel === "Delivery") {
+            comandas[id].taxa = taxa;
+            comandas[id].endereco = endereco;
+        }
+    }
 
-    let total = produto.preco * qtd;
-
-    comandas[mesa].push({
-        nome:produto.nome,
+    comandas[id].itens.push({
+        nome: produto.nome,
         qtd,
-        preco:produto.preco,
-        total
+        preco: produto.preco,
+        total: produto.preco * qtd,
+        obs: obsItem.value.trim()
     });
 
     produto.qtd -= qtd;
-
+    obsItem.value = "";
     salvarDados();
     atualizarEstoque();
     atualizarMesa();
 }
 
 function atualizarMesa(){
-    let mesa = mesaSelect.value;
+    let mesaSel = mesaSelect.value;
+    let nomeCli = nomeCliente.value.trim();
+    let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
+    
     itensMesa.innerHTML="";
-    let total=0;
+    let totalGeral=0;
 
-    if(mesa==="todas"){
-        for(let m in comandas){
-            itensMesa.innerHTML+=
-            `<tr><td colspan="4"><b>Mesa ${m}</b></td></tr>`;
-            
-            comandas[m].forEach((item,index)=>{
-                total+=item.total;
-                itensMesa.innerHTML+=
-                `<tr>
-                    <td>${item.nome}</td>
-                    <td>${item.qtd}</td>
-                    <td>R$ ${item.total.toFixed(2)}</td>
-                    <td></td>
-                </tr>`;
-            });
-        }
-        totalMesa.innerHTML="Total Geral em Aberto: R$ "+total.toFixed(2);
-        return;
-    }
-
-    if(comandas[mesa]){
-        comandas[mesa].forEach((item,index)=>{
-            total+=item.total;
-            itensMesa.innerHTML+=
-            `<tr>
-                <td>${item.nome}</td>
-                <td>${item.qtd}</td>
-                <td>R$ ${item.total.toFixed(2)}</td>
-                    <td>
-                     <button onclick="removerUmaUnidade('${mesa}',${index})">➖</button>
-                     <button onclick="removerItem('${mesa}',${index})">❌</button>
-                    </td>
-            </tr>`;
+    const renderLinhas = (id) => {
+        let subtotal = 0;
+        comandas[id].itens.forEach((item, index) => {
+            subtotal += item.total;
+            itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td class="obs-text">${item.obs || "-"}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
+            <td><button class="btn-danger" onclick="removerItem('${id}',${index})">❌</button></td></tr>`;
         });
-    }
-
-    totalMesa.innerHTML="Total Mesa: R$ "+total.toFixed(2);
-}
-
-function removerItem(mesa,index){
-    let item = comandas[mesa][index];
-
-    let produto = estoque.find(p=>p.nome===item.nome);
-    if(produto){
-        produto.qtd += item.qtd;
-    }
-
-    comandas[mesa].splice(index,1);
-
-    if(comandas[mesa].length===0){
-        delete comandas[mesa];
-    }
-
-    salvarDados();
-    atualizarEstoque();
-    atualizarMesa();
-}
-
-function removerUmaUnidade(mesa, index){
-
-    let item = comandas[mesa][index];
-
-    // devolve 1 unidade ao estoque
-    let produto = estoque.find(p => p.nome === item.nome);
-    if(produto){
-        produto.qtd += 1;
-    }
-
-    // reduz quantidade do item
-    item.qtd -= 1;
-    item.total = item.qtd * item.preco;
-
-    // se quantidade zerar, remove o item inteiro
-    if(item.qtd <= 0){
-        comandas[mesa].splice(index,1);
-    }
-
-    // se a mesa ficar vazia, remove a mesa
-    if(comandas[mesa] && comandas[mesa].length === 0){
-        delete comandas[mesa];
-    }
-
-    salvarDados();
-    atualizarEstoque();
-    atualizarMesa();
-}
-
-
-mesaSelect.addEventListener("change", atualizarMesa);
-
-function fecharMesa(){
-
-    let mesa = mesaSelect.value;
-
-    if(mesa==="todas") return alert("Selecione uma mesa específica");
-
-    if(!comandas[mesa]) return alert("Mesa vazia");
-
-    let pagamento = prompt("Forma de pagamento:\n1 - Dinheiro\n2 - Pix\n3 - Crédito\n4 - Débito");
-
-    let formaPagamento = "";
-
-    switch(pagamento){
-        case "1": formaPagamento="Dinheiro"; break;
-        case "2": formaPagamento="Pix"; break;
-        case "3": formaPagamento="Crédito"; break;
-        case "4": formaPagamento="Débito"; break;
-        default: return alert("Forma inválida");
-    }
-
-    let total = comandas[mesa].reduce((s,i)=>s+i.total,0);
-
-    let agora = new Date();
-
-    let registro = {
-        mesa,
-        itens: comandas[mesa],
-        total,
-        formaPagamento,
-        data: agora.toISOString()
+        if(comandas[id].taxa > 0) {
+            itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>TAXA DE ENTREGA</td><td colspan="2">${comandas[id].endereco}</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
+            subtotal += comandas[id].taxa;
+        }
+        return subtotal;
     };
 
-    let historico = JSON.parse(localStorage.getItem("historico")) || [];
-    historico.push(registro);
-    localStorage.setItem("historico", JSON.stringify(historico));
-
-    totalDia+=total;
-
-    imprimirCupom(mesa, comandas[mesa], total);
-
-    delete comandas[mesa];
-
-    salvarDados();
-    atualizarMesa();
-    atualizarTotalDia();
+    if(mesaSel === "todas"){
+        for(let id in comandas) totalGeral += renderLinhas(id);
+    } else if(comandas[idBusca]){
+        totalGeral = renderLinhas(idBusca);
+    }
+    
+    totalMesa.innerHTML = "Total: R$ " + totalGeral.toFixed(2);
 }
 
+function removerItem(id, idx){
+    let item = comandas[id].itens[idx];
+    let p = estoque.find(p=>p.nome===item.nome);
+    if(p) p.qtd += item.qtd;
+    comandas[id].itens.splice(idx,1);
+    if(comandas[id].itens.length===0) delete comandas[id];
+    salvarDados(); atualizarEstoque(); atualizarMesa();
+}
+
+function fecharMesa(){
+    let mesaSel = mesaSelect.value;
+    let nomeCli = nomeCliente.value.trim();
+    let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
+
+    if(!comandas[idBusca]) return alert("Selecione uma conta aberta.");
+
+    let pag = prompt("Pagamento:\n1-Dinheiro | 2-Pix | 3-Cartão");
+    let formas = {"1":"Dinheiro", "2":"Pix", "3":"Cartão"};
+    if(!formas[pag]) return alert("Cancelado.");
+
+    let totalItens = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0);
+    let totalFinal = totalItens + comandas[idBusca].taxa;
+
+    imprimirCupom(idBusca, comandas[idBusca], totalFinal);
+    
+    totalDia += totalFinal;
+    delete comandas[idBusca];
+    if(mesaSel === "Delivery") { nomeCliente.value=""; endCliente.value=""; taxaEntrega.value=""; }
+
+    salvarDados(); atualizarMesa(); atualizarTotalDia();
+}
+
+function imprimirCupom(id, obj, total){
+    let janela = window.open("", "", "width=300,height=600");
+    let cupom = `<pre style="font-family:monospace">
+SERENADA PUB & BURGER
+----------------------------
+PEDIDO: ${id}
+DATA: ${new Date().toLocaleString()}
+----------------------------\n`;
+    
+    obj.itens.forEach(i => {
+        cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`;
+        if(i.obs) cupom += `  * ${i.obs}\n`;
+    });
+
+    if(obj.taxa > 0) {
+        cupom += `----------------------------\n`;
+        cupom += `ENTREGA: R$ ${obj.taxa.toFixed(2)}\n`;
+        cupom += `END: ${obj.endereco}\n`;
+    }
+
+    cupom += `----------------------------
+TOTAL: R$ ${total.toFixed(2)}
+----------------------------
+Obrigado pela preferência!
+</pre>`;
+    janela.document.write(cupom);
+    janela.print();
+    janela.close();
+}
+
+function zerarSistema() {
+    if(prompt("Senha Mestre:") === SENHA_SISTEMA) {
+        if(confirm("Zerar todas as vendas e mesas?")) {
+            comandas = {}; totalDia = 0;
+            localStorage.removeItem("historico");
+            salvarDados(); location.reload();
+        }
+    } else alert("Senha incorreta!");
+}
 
 function atualizarTotalDia(){
-    totalDiaDiv = document.getElementById("totalDia");
-    totalDiaDiv.innerHTML="Total do Dia: R$ "+totalDia.toFixed(2);
+    document.getElementById("totalDia").innerHTML="Total: R$ "+totalDia.toFixed(2);
 }
 
 function fecharCaixa(){
-
-    if(totalDia === 0){
-        return alert("Não há valores para fechar no caixa.");
-    }
-
-    let agora = new Date();
-
-    let dataFormatada =
-        agora.toLocaleDateString("pt-BR") + " " +
-        agora.toLocaleTimeString("pt-BR");
-
-    let relatorio = "SERENADA PUB & BURGER\n";
-    relatorio += "RELATÓRIO DE FECHAMENTO DE CAIXA\n";
-    relatorio += "----------------------------------\n";
-    relatorio += "Data e Hora: " + dataFormatada + "\n\n";
-    relatorio += "Total do Dia: R$ " + totalDia.toFixed(2) + "\n";
-    relatorio += "----------------------------------\n";
-    relatorio += "Fechamento realizado com sucesso.\n";
-
-    // gerar arquivo txt
-    let blob = new Blob([relatorio], { type: "text/plain" });
+    if(totalDia === 0) return alert("Sem vendas!");
+    let rel = `SERENADA PUB - FECHAMENTO\nDATA: ${new Date().toLocaleString()}\nTOTAL: R$ ${totalDia.toFixed(2)}`;
+    let blob = new Blob([rel], { type: "text/plain" });
     let link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "fechamento_caixa_" + agora.getTime() + ".txt";
+    link.download = `caixa.txt`;
     link.click();
-
-    alert("Caixa fechado com sucesso!\nTotal: R$ " + totalDia.toFixed(2));
-
-    totalDia = 0;
-    salvarDados();
-    atualizarTotalDia();
 }
 
-function imprimirCupom(mesa, itens, total){
-    let janela = window.open("", "", "width=300,height=600");
-
-    let conteudo = `
-    <pre>
-SERENADA PUB & BURGER
-Mesa: ${mesa}
---------------------------
-`;
-
-    itens.forEach(i=>{
-        conteudo+=`${i.nome}
-${i.qtd} x ${i.preco.toFixed(2)} = ${i.total.toFixed(2)}
-`;
-    });
-
-    conteudo+=`
---------------------------
-TOTAL: R$ ${total.toFixed(2)}
-
-Obrigado pela preferência!
-    </pre>
-    `;
-
-    janela.document.write(conteudo);
-    janela.print();
-    janela.close();
+function gerarRelatorioCompleto(){
+    alert("Função de relatório em texto baixada via 'Encerrar Caixa'.");
 }
 
 atualizarEstoque();
 atualizarMesas();
 atualizarTotalDia();
-
-function gerarRelatorioMensal(){
-
-    let historico = JSON.parse(localStorage.getItem("historico")) || [];
-    let agora = new Date();
-    let mesAtual = agora.getMonth();
-    let anoAtual = agora.getFullYear();
-
-    let totalMes = 0;
-
-    historico.forEach(reg=>{
-        let data = new Date(reg.data);
-
-        if(data.getMonth()===mesAtual && data.getFullYear()===anoAtual){
-            totalMes+=reg.total;
-        }
-    });
-
-    alert("Total acumulado no mês: R$ "+totalMes.toFixed(2));
-}
-
-function gerarRelatorioCompleto(){
-
-    let historico = JSON.parse(localStorage.getItem("historico")) || [];
-    let hoje = new Date().toLocaleDateString("pt-BR");
-
-    let texto = "RELATÓRIO COMPLETO DO DIA\n\n";
-
-    historico.forEach(reg=>{
-        let dataReg = new Date(reg.data).toLocaleDateString("pt-BR");
-
-        if(dataReg === hoje){
-            texto += "Mesa: " + reg.mesa + "\n";
-            texto += "Pagamento: " + reg.formaPagamento + "\n";
-
-            reg.itens.forEach(i=>{
-                texto += i.nome + " - " + i.qtd + " - R$ " + i.total.toFixed(2) + "\n";
-            });
-
-            texto += "Total: R$ " + reg.total.toFixed(2) + "\n";
-            texto += "-------------------------\n";
-        }
-    });
-
-    let blob = new Blob([texto], { type: "text/plain" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "relatorio_dia.txt";
-    link.click();
-}
-if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("sw.js");
-}
-
 </script>
-
-
 </body>
 </html>
