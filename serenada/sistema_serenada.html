@@ -9,131 +9,124 @@
 <style>
 body{
     margin:0;
-    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background:#121212;
     color:#fff;
-    font-size: 14px; /* Base ligeiramente menor */
 }
 
 .container{
     max-width:1100px;
-    margin:10px auto;
+    margin:15px auto;
     background:#1e1e1e;
-    padding:15px;
+    padding:25px;
     border-radius:12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
 .logo-container {
     display: grid;
-    grid-template-columns: 80px 1fr 80px; 
+    grid-template-columns: 100px 1fr 100px; 
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-.logo-container img { width: 60px; grid-column: 1; }
+.logo-container img { width: 80px; grid-column: 1; }
 
 .logo-container h1 {
     grid-column: 2;
     text-align: center;
     margin: 0;
     color: #03dac6;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     letter-spacing: 1px;
 }
 
 .section{
-    margin-top:15px;
-    padding:12px;
+    margin-top:20px;
+    padding:15px;
     background:#2a2a2a;
     border-radius:10px;
 }
 
-h3 { 
-    font-size: 1rem; 
-    margin: 0 0 10px 0; 
-    color: #03dac6;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
 input, select{
-    padding:8px;
-    margin:4px 0;
-    border-radius: 4px;
+    padding:10px;
+    margin:5px 0;
+    border-radius: 6px;
     border: 1px solid #444;
     background: #333;
     color: #fff;
     outline: none;
-    font-size: 0.9rem;
     box-sizing: border-box;
 }
 
 button{
-    padding:10px;
-    margin:4px 0;
+    padding:12px 15px;
+    margin:5px 0;
     cursor:pointer;
     border:none;
     border-radius:6px;
     font-weight: bold;
-    font-size: 0.9rem;
     transition: 0.2s;
     width: 100%;
 }
 
 .btn-inline { width: auto; margin: 2px; }
 
-/* BOTÕES DE QUANTIDADE MINI */
+/* ESTILO DOS BOTÕES DE QUANTIDADE (MAIS PROFISSIONAIS) */
 .btn-qty {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     background: #444;
     color: #03dac6;
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: 50%;
+    font-size: 14px;
+    line-height: 1;
 }
+
+.btn-qty:hover { background: #555; transform: scale(1.1); }
 
 .qty-display {
     display: inline-block;
-    min-width: 25px;
+    min-width: 30px;
     text-align: center;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 1.1em;
 }
 
 .btn-primary{ background:#03dac6; color: #000; }
 .btn-danger{ background:#ff5252; color:#fff; }
 .btn-close{ background:#ff4081; color:#fff; }
+.btn-warning { background: #ffb100; color: #000; }
 
 .table-responsive {
     width: 100%;
     overflow-x: auto;
-    margin-top: 10px;
+    -webkit-overflow-scrolling: touch;
 }
 
 table{
     width:100%;
     border-collapse:collapse;
-    min-width: 450px; /* Reduzido para acomodar telas menores */
+    margin-top:10px;
+    min-width: 600px;
 }
 
 th, td{
     border-bottom:1px solid #444;
-    padding:8px 4px;
+    padding:10px;
     text-align:center;
-    font-size: 0.85rem;
 }
 
-th { background: #333; color: #03dac6; font-weight: 600; }
+th { background: #333; color: #03dac6; }
 
 .total{
     font-weight:bold;
-    margin-top:10px;
-    font-size: 1.2em;
+    margin-top:15px;
+    font-size: 1.4em;
     color: #03dac6;
     text-align: right;
 }
@@ -141,28 +134,25 @@ th { background: #333; color: #03dac6; font-weight: 600; }
 #painelDelivery { 
     display: none; 
     flex-direction: column;
-    border-left: 3px solid #03dac6;
-    padding-left: 8px;
-    margin: 8px 0;
+    border-left: 4px solid #03dac6;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.btn-reprint {
+    padding: 5px 10px;
+    font-size: 1.2em;
+    background: #5d5d5d;
+    color: white;
+    width: auto;
 }
 
 @media (max-width: 768px) {
     .logo-container { grid-template-columns: 1fr; justify-items: center; }
     .logo-container div:last-child { display: none; }
-    .logo-container h1 { font-size: 1.1rem; }
-    
-    /* Layout de cadastro em grade no mobile */
-    .cadastro-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 5px;
-    }
-    .cadastro-grid input#nomeProduto { grid-column: span 2; }
-    
-    .section button { width: 100%; }
-    .container { margin: 0; border-radius: 0; padding: 10px; }
-    
-    th, td { padding: 6px 2px; font-size: 0.8rem; }
+    .logo-container h1 { grid-column: 1; font-size: 1.2rem; margin-top: 10px; }
+    input, select, .section button { width: 100%; }
+    .container { margin: 0; border-radius: 0; }
 }
 </style>
 </head>
@@ -170,33 +160,33 @@ th { background: #333; color: #03dac6; font-weight: 600; }
 
 <div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999; padding: 20px; box-sizing: border-box;">
     <h2 style="color:#03dac6; text-align: center;">🍔 Serenada Pub - Acesso</h2>
-    <input type="password" id="senhaLogin" placeholder="Senha" onkeydown="if(event.key === 'Enter'){ fazerLogin();}" style="text-align:center; width: 100%; max-width: 250px;">
-    <button class="btn-primary" onclick="fazerLogin()" style="max-width: 250px;">Entrar</button>
+    <input type="password" id="senhaLogin" placeholder="Senha" onkeydown="if(event.key === 'Enter'){ fazerLogin();}" style="text-align:center; width: 100%; max-width: 300px;">
+    <button class="btn-primary" onclick="fazerLogin()" style="max-width: 300px;">Entrar</button>
 </div>
 
 <div class="container">
     <header class="logo-container">
         <img src="icon-192.png" alt="Logo">
         <h1>.:SERENADA PUB & BURGER:.</h1>
-        <div style="width: 80px;"></div>
+        <div style="width: 100px;"></div>
     </header>
 
     <div class="section">
-        <h3>📦 Estoque</h3>
-        <div class="cadastro-grid" style="display: flex; flex-wrap: wrap; gap: 4px;">
-            <input id="nomeProduto" placeholder="Produto" style="flex: 2; min-width: 140px;">
-            <input id="precoProduto" type="number" step="0.01" placeholder="R$" style="flex: 1; min-width: 60px;">
-            <input id="estoqueProduto" type="number" placeholder="Qtd" style="flex: 1; min-width: 50px;">
-            <button class="btn-primary" style="flex: 1; min-width: 100px; padding: 8px;" onclick="cadastrarProduto()">Salvar</button>
+        <h3>📦 Cadastro de Estoque</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            <input id="nomeProduto" placeholder="Nome do Produto" style="flex: 2;">
+            <input id="precoProduto" type="number" step="0.01" placeholder="Preço" style="flex: 1;">
+            <input id="estoqueProduto" type="number" placeholder="Qtd Inicial" style="flex: 1;">
+            <button class="btn-primary" style="flex: 1; width: auto;" onclick="cadastrarProduto()">Cadastrar</button>
         </div>
 
         <div class="table-responsive">
             <table>
                 <thead>
                     <tr>
-                        <th style="text-align: left;">Item</th>
+                        <th>Produto</th>
                         <th>Preço</th>
-                        <th>Qtd</th>
+                        <th>Estoque</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -206,19 +196,19 @@ th { background: #333; color: #03dac6; font-weight: 600; }
     </div>
 
     <div class="section">
-        <h3>🔥 Pedido</h3>
+        <h3>🔥 Lançar Pedido</h3>
         <select id="mesaSelect" onchange="toggleCliente()" style="width: 100%;"></select>
         <div id="painelDelivery">
-            <input type="text" id="nomeCliente" placeholder="Cliente">
+            <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
             <input type="text" id="endCliente" placeholder="Endereço">
             <input type="number" id="taxaEntrega" placeholder="Taxa R$">
         </div>
 
-        <div style="margin-top:8px; display: grid; grid-template-columns: 2fr 1fr; gap: 4px;">
+        <div style="margin-top:10px; display: grid; grid-template-columns: 2fr 1fr; gap: 5px;">
             <select id="produtoSelect"></select>
             <input type="number" id="qtdItem" value="1" min="1">
-            <input type="text" id="obsItem" placeholder="Observações..." style="grid-column: span 2;">
-            <button class="btn-primary" onclick="adicionarItem()" style="grid-column: span 2;">Adicionar</button>
+            <input type="text" id="obsItem" placeholder="Obs: Sem cebola..." style="grid-column: span 2;">
+            <button class="btn-primary" onclick="adicionarItem()" style="grid-column: span 2;">Adicionar na Conta</button>
         </div>
 
         <div class="table-responsive">
@@ -226,38 +216,47 @@ th { background: #333; color: #03dac6; font-weight: 600; }
                 <thead>
                     <tr>
                         <th>Local</th>
-                        <th>Item</th>
+                        <th>Produto</th>
+                        <th>Obs</th>
                         <th>Qtd</th>
                         <th>Total</th>
-                        <th></th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="itensMesa"></tbody>
             </table>
         </div>
         <div class="total" id="totalMesa">Total: R$ 0.00</div>
-        <button class="btn-close" onclick="fecharMesa()">Fechar Comanda</button>
+        <button class="btn-close" onclick="fecharMesa()">Finalizar e Imprimir Cupom</button>
     </div>
 
-    <div class="section">
-        <h3>💰 Caixa</h3>
-        <div id="totalDia" style="font-size: 1.5em; color: #03dac6; margin-bottom: 10px;">R$ 0.00</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-            <button class="btn-primary" onclick="gerarRelatorioCompleto()">Relatório</button>
-            <button class="btn-danger" onclick="fecharCaixa()">Encerrar</button>
+    <div class="section" style="display: flex; flex-direction: column; gap: 10px;">
+        <div>
+            <h3>💰 Caixa do Dia</h3>
+            <div id="totalDia" style="font-size: 1.8em; color: #03dac6;">Total: R$ 0.00</div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+            <button class="btn-primary btn-inline" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+            <button class="btn-danger btn-inline" onclick="fecharCaixa()">Encerrar Caixa</button>
+            <button class="btn-warning btn-inline" onclick="zerarSistema()">⚠️ Zerar</button>
+            <button class="btn-primary btn-inline" style="background: #5d5d5d; color: white;" onclick="limparHistoricoVisual()">🧹 Limpar</button>
+            <button class="btn-warning btn-inline" onclick="document.getElementById('inputCSV').click()">📂 Importar</button>
+            <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
         </div>
     </div>
 
     <div class="section">
-        <h3>📜 Histórico</h3>
-        <div class="table-responsive" style="max-height: 200px; overflow-y: auto;">
+        <h3>📜 Histórico de Comandas</h3>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
             <table>
                 <thead>
                     <tr>
-                        <th>Hora</th>
-                        <th>Local</th>
+                        <th>ID Pedido</th>
+                        <th>Data/Hora</th>
+                        <th>Cliente</th>
+                        <th>Pagto</th>
                         <th>Total</th>
-                        <th></th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaHistorico"></tbody>
@@ -267,7 +266,7 @@ th { background: #333; color: #03dac6; font-weight: 600; }
 </div>
 
 <script>
-/* LÓGICA MANTIDA E OTIMIZADA */
+/* LOGICA DO SISTEMA */
 const SENHA_SISTEMA = "1234"; 
 let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
 let comandas = JSON.parse(localStorage.getItem("comandas")) || {};
@@ -294,7 +293,7 @@ function cadastrarProduto(){
     let nome = nomeProduto.value.trim();
     let preco = parseFloat(precoProduto.value);
     let qtd = parseInt(estoqueProduto.value);
-    if(!nome || isNaN(preco)) return alert("Preencha os campos!");
+    if(!nome || isNaN(preco) || preco <= 0 || isNaN(qtd) || qtd < 0) return alert("Valores inválidos!");
     estoque.push({nome, preco, qtd});
     salvarDados(); atualizarEstoque();
     nomeProduto.value = ""; precoProduto.value = ""; estoqueProduto.value = "";
@@ -306,21 +305,21 @@ function atualizarEstoque(){
     estoque.forEach((p,i)=>{
         tabelaEstoque.innerHTML+=
         `<tr>
-            <td style="text-align: left;">${p.nome}</td>
+            <td>${p.nome}</td>
             <td>R$ ${p.preco.toFixed(2)}</td>
-            <td style="white-space: nowrap;">
-                <button class="btn-qty" onclick="alterarEstoque(${i}, -1)">-</button>
+            <td>
+                <button class="btn-qty" onclick="alterarEstoque(${i}, -1)">–</button>
                 <span class="qty-display">${p.qtd}</span>
                 <button class="btn-qty" onclick="alterarEstoque(${i}, 1)">+</button>
             </td>
-            <td><button class="btn-danger" style="width: 30px; padding: 4px;" onclick="excluirProduto(${i})">🗑️</button></td>
+            <td><button class="btn-danger btn-inline" style="padding: 5px 10px;" onclick="excluirProduto(${i})">🗑️</button></td>
         </tr>`;
         produtoSelect.innerHTML+= `<option value="${i}">${p.nome}</option>`;
     });
 }
 
 function alterarEstoque(i, n){
-    if(estoque[i].qtd + n < 0) return;
+    if(estoque[i].qtd + n < 0) return alert("Estoque insuficiente!");
     estoque[i].qtd += n;
     salvarDados(); atualizarEstoque();
 }
@@ -331,18 +330,18 @@ function excluirProduto(i) {
     }
 }
 function atualizarMesas(){
-    mesaSelect.innerHTML = `<option value="todas">Contas Abertas</option><option value="Balcão">📍 Balcão</option><option value="Delivery">🛵 Delivery</option>`;
+    mesaSelect.innerHTML = `<option value="todas">Ver Todas</option><option value="Balcão">📍 Balcão</option><option value="Delivery">🛵 Delivery</option>`;
     for(let i=1;i<=20;i++) mesaSelect.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
 }
 function adicionarItem(){
     let mesaSel = mesaSelect.value;
-    if(mesaSel==="todas") return alert("Selecione a Mesa!");
+    if(mesaSel==="todas") return alert("Selecione o destino");
     let pIdx = produtoSelect.value;
     let qtd = parseInt(qtdItem.value);
     let produto = estoque[pIdx];
-    if(!produto || qtd <= 0) return;
+    if(!produto || qtd <= 0) return alert("Verifique o produto!");
     if(produto.qtd < qtd) return alert("Sem estoque!");
-    let idComanda = (mesaSel === "Delivery") ? `DEL: ${nomeCliente.value.trim()}` : (mesaSel === "Balcão" ? "BALCÃO" : `M${mesaSel}`);
+    let idComanda = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCliente.value.trim()}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
     if(!comandas[idComanda]) {
         comandas[idComanda] = { itens: [], taxa: 0, endereco: "" };
         if(mesaSel === "Delivery") { 
@@ -357,18 +356,18 @@ function adicionarItem(){
 function atualizarMesa(){
     let mesaSel = mesaSelect.value;
     let nomeCli = nomeCliente.value.trim();
-    let idBusca = (mesaSel === "Delivery") ? `DEL: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `M${mesaSel}`);
+    let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
     itensMesa.innerHTML="";
     let totalGeral=0;
     const renderLinhas = (id) => {
         let subtotal = 0;
         comandas[id].itens.forEach((item, index) => {
             subtotal += item.total;
-            itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
-            <td><button class="btn-danger" style="width: 25px; padding: 2px;" onclick="removerItem('${id}',${index})">×</button></td></tr>`;
+            itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td class="obs-text">${item.obs || "-"}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
+            <td><button class="btn-danger btn-inline" onclick="removerItem('${id}',${index})">❌</button></td></tr>`;
         });
         if(comandas[id].taxa > 0) {
-            itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>Taxa</td><td>-</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
+            itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>TAXA</td><td colspan="2">${comandas[id].endereco}</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
             subtotal += comandas[id].taxa;
         }
         return subtotal;
@@ -390,28 +389,31 @@ function removerItem(id, idx){
 }
 function fecharMesa(){
     let mesaSel = mesaSelect.value;
-    let idBusca = (mesaSel === "Delivery") ? `DEL: ${nomeCliente.value.trim()}` : (mesaSel === "Balcão" ? "BALCÃO" : `M${mesaSel}`);
-    if(!comandas[idBusca]) return alert("Selecione a conta.");
+    let nomeCli = nomeCliente.value.trim();
+    let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
+    if(!comandas[idBusca]) return alert("Selecione uma conta aberta.");
     let pag = prompt("1-Dinheiro | 2-Pix | 3-Cartão");
     let formas = {"1":"Dinheiro", "2":"Pix", "3":"Cartão"};
-    if(!formas[pag]) return;
+    if(!formas[pag]) return alert("Cancelado.");
     let totalFinal = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0) + (comandas[idBusca].taxa || 0);
+    let pedidoID = "#" + Date.now().toString().slice(-6);
     historico.push({ 
-        id: "#" + Date.now().toString().slice(-4), data: new Date().toLocaleString(), local: idBusca, pagamento: formas[pag], 
+        id: pedidoID, data: new Date().toLocaleString(), local: idBusca, pagamento: formas[pag], 
         total: totalFinal, dadosCompletos: JSON.parse(JSON.stringify(comandas[idBusca])) 
     });
-    imprimirCupom(historico[historico.length-1].id, idBusca, comandas[idBusca], totalFinal, formas[pag]);
+    imprimirCupom(pedidoID, idBusca, comandas[idBusca], totalFinal, formas[pag]);
     totalDia += totalFinal; delete comandas[idBusca];
     salvarDados(); atualizarMesa(); atualizarTotalDia(); atualizarHistoricoUI();
 }
 function atualizarHistoricoUI(){
     tabelaHistorico.innerHTML = "";
-    [...historico].reverse().slice(0, 10).forEach((p, index) => {
+    [...historico].reverse().forEach((p, index) => {
         const realIdx = historico.length - 1 - index; 
         tabelaHistorico.innerHTML += `
-        <tr>
-            <td>${p.data.split(' ')[1]}</td><td>${p.local}</td><td>R$ ${p.total.toFixed(2)}</td>
-            <td><button class="btn-qty" onclick="reimprimirHistorico(${realIdx})">🖨️</button></td>
+        <tr class="historico-row">
+            <td>${p.id}</td><td>${p.data.split(' ')[1]}</td><td>${p.local}</td><td>${p.pagamento}</td>
+            <td style="color:#03dac6">R$ ${p.total.toFixed(2)}</td>
+            <td><button class="btn-primary btn-reprint" onclick="reimprimirHistorico(${realIdx})">🖨️</button></td>
         </tr>`;
     });
 }
@@ -419,25 +421,36 @@ function reimprimirHistorico(index) {
     const p = historico[index];
     imprimirCupom(p.id, p.local, p.dadosCompletos, p.total, p.pagamento);
 }
-function imprimirCupom(id, local, obj, total, pag){
-    let j = window.open("", "", "width=300");
-    let c = `<pre style="font-size:12px">SERENADA PUB\nID: ${id}\nLOCAL: ${local}\n-----------------\n`;
-    obj.itens.forEach(i => { c += `${i.qtd}x ${i.nome} R$${i.total.toFixed(2)}\n`; });
-    if(obj.taxa > 0) c += `TAXA: R$ ${obj.taxa.toFixed(2)}\n`;
-    c += `-----------------\nTOTAL: R$ ${total.toFixed(2)}\nPGTO: ${pag}\n</pre>`;
-    j.document.write(c); j.print(); j.close();
+function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
+    let janela = window.open("", "", "width=300,height=600");
+    let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\n----------------------------\nPEDIDO ID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
+    obj.itens.forEach(i => { cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; if(i.obs) cupom += `   * ${i.obs}\n`; });
+    if(obj.taxa > 0) cupom += `----------------------------\nENTREGA: R$ ${obj.taxa.toFixed(2)}\n`;
+    cupom += `----------------------------\nPAGAMENTO: ${formaPag}\nTOTAL: R$ ${total.toFixed(2)}\n----------------------------\nObrigado!\n</pre>`;
+    janela.document.write(cupom); janela.print(); janela.close();
+}
+function zerarSistema() {
+    if(prompt("Senha Mestre:") === SENHA_SISTEMA) {
+        comandas = {}; totalDia = 0; historico = []; salvarDados(); location.reload();
+    }
 }
 function atualizarTotalDia(){
     document.getElementById("totalDia").innerHTML="Total: R$ "+totalDia.toFixed(2);
 }
 function fecharCaixa(){
-    if(confirm("Encerrar dia?")) {
+    if(totalDia === 0) return alert("Sem vendas!");
+    if(confirm("Encerrar caixa e gerar CSV?")) {
+        let csvContent = "ID;Data;Local;Pagto;Total\n";
+        historico.forEach(h => { csvContent += `${h.id};${h.data};${h.local};${h.pagamento};${h.total.toFixed(2)}\n`; });
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", `caixa_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+        link.click();
         totalDia = 0; historico = []; salvarDados(); location.reload();
     }
 }
-function gerarRelatorioCompleto(){ 
-    alert(`Faturamento: R$ ${totalDia.toFixed(2)}\nPedidos: ${historico.length}`);
-}
+function limparHistoricoVisual() { historico = []; atualizarHistoricoUI(); }
 
 atualizarEstoque(); atualizarMesas(); atualizarTotalDia(); atualizarHistoricoUI();
 </script>
