@@ -106,12 +106,20 @@ th { background: #333; color: #03dac6; }
 
 .logo-container {
     display: flex;
-    align-items: center;   /* Alinha verticalmente */
-    gap: 15px;             /* Espaço entre logo e texto */
+    align-items: center;
+    gap: 15px;
 }
 
 .logo-container img {
-    width: 100px;           /* Ajuste o tamanho se quiser */
+    width: 100px;
+}
+
+/* Estilo para o botão de reimpressão pequeno */
+.btn-reprint {
+    padding: 5px 10px;
+    font-size: 1.2em;
+    background: #5d5d5d;
+    color: white;
 }
 </style>
 </head>
@@ -126,8 +134,7 @@ th { background: #333; color: #03dac6; }
 <div class="container">
     <div class="logo-container">
         <img src="icon-192.png" alt="Logo">
-  
-        <h1>    .:SERENADA PUB & BURGER:.</h1>
+        <h1>.:SERENADA PUB & BURGER:.</h1>
     </div>
 
     <div class="section">
@@ -192,14 +199,14 @@ th { background: #333; color: #03dac6; }
             <h3>💰 Caixa do Dia</h3>
             <div id="totalDia" style="font-size: 1.8em; color: #03dac6;">Total: R$ 0.00</div>
         </div>
-   <div>
-    <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
-    <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
-    <button class="btn-warning" onclick="zerarSistema()">⚠️ Zerar Tudo</button>
-    <button class="btn-primary" style="background: #5d5d5d; color: white;" onclick="limparHistoricoVisual()">🧹 Limpar Histórico</button>
-    <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
-    <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
-</div>
+        <div>
+            <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+            <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
+            <button class="btn-warning" onclick="zerarSistema()">⚠️ Zerar Tudo</button>
+            <button class="btn-primary" style="background: #5d5d5d; color: white;" onclick="limparHistoricoVisual()">🧹 Limpar Histórico</button>
+            <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
+            <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
+        </div>
     </div>
 
     <div class="section">
@@ -213,6 +220,7 @@ th { background: #333; color: #03dac6; }
                         <th>Cliente/Mesa</th>
                         <th>Pagamento</th>
                         <th>Valor Total</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody id="tabelaHistorico"></tbody>
@@ -354,24 +362,44 @@ function fecharMesa(){
     let mesaSel = mesaSelect.value;
     let nomeCli = nomeCliente.value.trim();
     let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
+    
     if(!comandas[idBusca]) return alert("Selecione uma conta aberta.");
+    
     let pag = prompt("Pagamento:\n1-Dinheiro | 2-Pix | 3-Cartão");
     let formas = {"1":"Dinheiro", "2":"Pix", "3":"Cartão"};
     if(!formas[pag]) return alert("Cancelado.");
-    let totalFinal = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0) + comandas[idBusca].taxa;
+    
+    let totalFinal = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0) + (comandas[idBusca].taxa || 0);
     let pedidoID = "#" + Date.now().toString().slice(-6);
     let resumoItens = comandas[idBusca].itens.map(i => `${i.qtd}x ${i.nome}`).join(", ");
-    historico.push({ id: pedidoID, data: new Date().toLocaleString(), local: idBusca, pagamento: formas[pag], itensVendidos: resumoItens, total: totalFinal });
+    
+    // NOVIDADE: Salvando o objeto completo para permitir reimpressão futura
+    historico.push({ 
+        id: pedidoID, 
+        data: new Date().toLocaleString(), 
+        local: idBusca, 
+        pagamento: formas[pag], 
+        itensVendidos: resumoItens, 
+        total: totalFinal,
+        dadosCompletos: JSON.parse(JSON.stringify(comandas[idBusca])) 
+    });
+
     imprimirCupom(pedidoID, idBusca, comandas[idBusca], totalFinal, formas[pag]);
+    
     totalDia += totalFinal;
     delete comandas[idBusca];
     if(mesaSel === "Delivery") { nomeCliente.value=""; endCliente.value=""; taxaEntrega.value=""; }
-    salvarDados(); atualizarMesa(); atualizarTotalDia(); atualizarHistoricoUI();
+    
+    salvarDados(); 
+    atualizarMesa(); 
+    atualizarTotalDia(); 
+    atualizarHistoricoUI();
 }
 
 function atualizarHistoricoUI(){
     tabelaHistorico.innerHTML = "";
-    [...historico].reverse().forEach(p => {
+    [...historico].reverse().forEach((p, index) => {
+        const realIdx = historico.length - 1 - index; 
         tabelaHistorico.innerHTML += `
         <tr class="historico-row">
             <td>${p.id}</td>
@@ -379,17 +407,31 @@ function atualizarHistoricoUI(){
             <td>${p.local}</td>
             <td>${p.pagamento}</td>
             <td style="color:#03dac6">R$ ${p.total.toFixed(2)}</td>
+            <td>
+                <button class="btn-primary btn-reprint" onclick="reimprimirHistorico(${realIdx})" title="Reimprimir Cupom">🖨️</button>
+            </td>
         </tr>`;
     });
+}
+
+function reimprimirHistorico(index) {
+    const p = historico[index];
+    if(!p.dadosCompletos) return alert("Registro sem dados detalhados para reimpressão.");
+    imprimirCupom(p.id, p.local, p.dadosCompletos, p.total, p.pagamento);
 }
 
 function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
     let janela = window.open("", "", "width=300,height=600");
     let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\nCNPJ: 00.000.000/0001-00\n----------------------------\nPEDIDO ID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
-    obj.itens.forEach(i => { cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; if(i.obs) cupom += `   * ${i.obs}\n`; });
+    obj.itens.forEach(i => { 
+        cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; 
+        if(i.obs) cupom += `   * ${i.obs}\n`; 
+    });
     if(obj.taxa > 0) cupom += `----------------------------\nENTREGA: R$ ${obj.taxa.toFixed(2)}\n`;
     cupom += `----------------------------\nPAGAMENTO: ${formaPag}\nTOTAL: R$ ${total.toFixed(2)}\n----------------------------\nObrigado pela preferência!\n</pre>`;
-    janela.document.write(cupom); janela.print(); janela.close();
+    janela.document.write(cupom); 
+    janela.print(); 
+    janela.close();
 }
 
 function zerarSistema() {
@@ -428,7 +470,6 @@ function fecharCaixa(){
         link.click();
         document.body.removeChild(link);
 
-        // Reset real do sistema
         totalDia = 0;
         historico = [];
         salvarDados();
@@ -438,12 +479,9 @@ function fecharCaixa(){
     }
 }
 
-// ESTA FUNÇÃO PRECISA ESTAR AQUI FORA PARA O BOTÃO FUNCIONAR
 function limparHistoricoVisual() {
     if(confirm("Deseja limpar apenas a lista visual do histórico?\n\n(Isso NÃO apaga o faturamento do dia nem as mesas abertas).")) {
         historico = [];
-        // Não chamamos salvarDados() aqui se você quiser que os dados voltem ao dar F5
-        // Se quiser que a limpeza seja permanente no navegador, use: salvarDados();
         atualizarHistoricoUI();
         alert("Visualização limpa!");
     }
@@ -488,7 +526,6 @@ function importarCSV(event) {
     event.target.value = "";
 }
 
-// Alterei para não fechar o caixa sozinho, apenas mostrar um resumo se quiser
 function gerarRelatorioCompleto(){ 
     alert(`Resumo atual do faturamento: R$ ${totalDia.toFixed(2)}\nPedidos no histórico: ${historico.length}`);
 }
