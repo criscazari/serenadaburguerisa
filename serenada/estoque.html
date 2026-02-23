@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serenada Pub & Burger - Estoque</title>
+
+<link rel="icon" type="image/png" href="assets/hamburger.png">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+<header class="logo-container">
+    <img src="assets/icon-192.png" alt="Logo">
+    <h1>⚙️ Gerenciamento de Estoque</h1>
+    <a href="index.html" class="btn-gray">⬅ Voltar ao PDV</a>
+</header>
+
+<div class="section">
+    <h3>📦 Cadastro de Produto</h3>
+
+    <input id="nomeProduto" placeholder="Nome do Produto">
+    <input id="precoProduto" type="number" step="0.01" min="0.01" placeholder="Preço (ex: 25.50)">
+    <input id="estoqueProduto" type="number" min="0" placeholder="Quantidade Inicial">
+
+    <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar Produto</button>
+</div>
+
+<div class="section">
+    <h3>📋 Produtos Cadastrados</h3>
+
+    <div class="historico-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Preço</th>
+                    <th>Estoque</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaEstoque"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="section caixa-section">
+    <div>
+        <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">
+            📂 Importar CSV
+        </button>
+        <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
+    </div>
+
+    <div>
+        <button class="btn-danger" onclick="zerarSistema()">⚠️ Zerar Sistema</button>
+    </div>
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+<script>
+/* Garante que a tabela seja carregada ao abrir a página */
+document.addEventListener("DOMContentLoaded", function(){
+    if(typeof renderEstoque === "function"){
+        renderEstoque();
+    }
+});
+</script>
+
+</body>
+</html>
