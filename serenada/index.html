@@ -1,49 +1,135 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Serenada Pub & Burger - Sistema</title>
-    <link rel="icon" type="image/png" href="hamburger.png">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serenada Pub & Burger - PDV</title>
+<link rel="icon" type="image/png" href="hamburger.png">
+<link rel="stylesheet" href="style.css">
 </head>
-<body> <button class="theme-toggle" onclick="toggleTheme()">🌗 Alternar Tema</button>
 
-    <div class="container">
-        <div class="logo-container">
-            <img src="hamburger.png" alt="Logo">
-            <h1>Serenada Pub & Burger 🍔</h1>
-        </div>
+<body>
 
-        <div class="section">
-            <h2>📦 Adicionar Produto</h2>
-            <input type="text" id="nomeProduto" placeholder="Nome do produto">
-            <input type="number" id="precoProduto" placeholder="Preço">
-            <button class="btn-primary" onclick="adicionarProduto()">Adicionar</button>
-        </div>
+<!-- ================= LOGIN ================= -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-box">
+        <h2>🔐 Acesso ao Sistema</h2>
+        <input type="password" id="senhaLogin" placeholder="Digite a senha">
+        <button onclick="fazerLogin()" class="btn-primary">Entrar</button>
+    </div>
+</div>
 
-        <div class="section">
-            <h2>🧾 Produtos</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Preço</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listaProdutos"></tbody>
-                </table>
-            </div>
-        </div>
+<button class="theme-toggle" onclick="toggleTheme()">🌗 Tema</button>
 
-        <div class="section">
-            <h2>💰 Total</h2>
-            <div class="total" id="valorTotal">R$ 0.00</div>
+<div class="container">
+
+    <!-- LOGO -->
+    <div class="logo-container">
+        <img src="hamburger.png" alt="Logo">
+        <h1>Serenada Pub & Burger 🍔</h1>
+    </div>
+
+    <!-- ================= CADASTRO PRODUTO ================= -->
+    <div class="section">
+        <h2>📦 Cadastro de Produto</h2>
+        <input type="text" id="nomeProduto" placeholder="Nome">
+        <input type="number" id="precoProduto" placeholder="Preço">
+        <input type="number" id="estoqueProduto" placeholder="Quantidade em estoque">
+        <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
+    </div>
+
+    <!-- ================= ESTOQUE ================= -->
+    <div class="section">
+        <h2>📊 Estoque</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Qtd</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEstoque"></tbody>
+            </table>
         </div>
     </div>
 
-    <script src="script.js"></script> 
+    <!-- ================= COMANDAS ================= -->
+    <div class="section">
+        <h2>🧾 Comandas</h2>
+
+        <select id="mesaSelect" onchange="toggleCliente()"></select>
+
+        <!-- DELIVERY -->
+        <div id="painelDelivery" style="display:none; gap:10px; margin-top:10px;">
+            <input type="text" id="nomeCliente" placeholder="Nome do cliente">
+            <input type="text" id="endCliente" placeholder="Endereço">
+            <input type="number" id="taxaEntrega" placeholder="Taxa de entrega">
+        </div>
+
+        <select id="produtoSelect"></select>
+        <input type="number" id="qtdItem" placeholder="Quantidade">
+        <input type="text" id="obsItem" placeholder="Observação">
+        <button class="btn-primary" onclick="adicionarItem()">Adicionar Item</button>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Local</th>
+                        <th>Produto</th>
+                        <th>Obs</th>
+                        <th>Qtd</th>
+                        <th>Total</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="itensMesa"></tbody>
+            </table>
+        </div>
+
+        <div id="totalMesa" class="total">Total: R$ 0.00</div>
+
+        <button class="btn-warning" onclick="fecharMesa()">💰 Fechar Conta</button>
+    </div>
+
+    <!-- ================= HISTÓRICO ================= -->
+    <div class="section">
+        <h2>📜 Histórico de Vendas</h2>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Data</th>
+                        <th>Local</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaHistorico"></tbody>
+            </table>
+        </div>
+
+        <button class="btn-danger" onclick="limparHistoricoVisual()">🗑️ Limpar Visual</button>
+        <button class="btn-primary" onclick="fecharCaixa()">📁 Fechar Caixa</button>
+        <input type="file" accept=".csv" onchange="importarCSV(event)">
+    </div>
+
+    <!-- ================= CAIXA ================= -->
+    <div class="section">
+        <h2>💵 Caixa do Dia</h2>
+        <div id="totalDia" class="total">Total: R$ 0.00</div>
+        <button class="btn-danger" onclick="zerarSistema()">⚠️ Zerar Sistema</button>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
 </body>
 </html>
