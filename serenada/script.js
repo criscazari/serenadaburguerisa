@@ -14,7 +14,7 @@ function salvarDados(){
     localStorage.setItem("historico", JSON.stringify(historico));
 }
 
-// --- GESTÃO DE ESTOQUE (estoque.html) ---
+// --- GESTÃO DE ESTOQUE ---
 function cadastrarProduto(){
     const inputNome = document.getElementById("nomeProduto");
     const inputPreco = document.getElementById("precoProduto");
@@ -26,38 +26,32 @@ function cadastrarProduto(){
     let preco = parseFloat(inputPreco.value);
     let qtd = parseInt(inputQtd.value);
 
-    if(!nome || isNaN(preco) || preco <= 0 || isNaN(qtd) || qtd < 0) {
-        return alert("Preencha todos os campos corretamente!");
-    }
-    
-    if(estoque.find(p => p.nome.toLowerCase() === nome.toLowerCase())) {
-        return alert("Este produto já está cadastrado!");
-    }
+    if(!nome || isNaN(preco) || preco <= 0 || isNaN(qtd) || qtd < 0) return alert("Valores inválidos!");
+    if(estoque.find(p => p.nome.toLowerCase() === nome.toLowerCase())) return alert("Produto já cadastrado!");
 
     estoque.push({nome, preco, qtd});
     salvarDados();
     renderizarTudo();
 
     inputNome.value = ""; inputPreco.value = ""; inputQtd.value = "";
-    alert("Produto cadastrado com sucesso!");
 }
 
 function alterarEstoque(i, n){
-    if(estoque[i].qtd + n < 0) return alert("O estoque não pode ser menor que zero!");
+    if(estoque[i].qtd + n < 0) return alert("Estoque insuficiente!");
     estoque[i].qtd += n;
     salvarDados();
     renderizarTudo();
 }
 
 function excluirProduto(i) {
-    if(confirm(`Tem certeza que deseja excluir "${estoque[i].nome}"?`)) {
+    if(confirm(`Excluir ${estoque[i].nome}?`)) {
         estoque.splice(i, 1);
         salvarDados();
         renderizarTudo();
     }
 }
 
-// --- GESTÃO DE PEDIDOS / PDV (index.html) ---
+// --- GESTÃO DE PEDIDOS (PDV) ---
 function adicionarItem(){
     const mesaSelect = document.getElementById("mesaSelect");
     const produtoSelect = document.getElementById("produtoSelect");
@@ -67,21 +61,17 @@ function adicionarItem(){
     if(!mesaSelect || !produtoSelect) return;
 
     let mesaSel = mesaSelect.value;
-    if(mesaSel === "todas") return alert("Selecione uma Mesa, Balcão ou Delivery!");
+    if(mesaSel === "todas") return alert("Selecione o destino");
     
     let pIdx = produtoSelect.value;
     let qtd = parseInt(qtdItem.value);
     let produto = estoque[pIdx];
 
-    if(!produto || qtd <= 0) return alert("Selecione um produto e quantidade válida!");
-    if(produto.qtd < qtd) return alert("Estoque insuficiente!");
+    if(!produto || qtd <= 0) return alert("Verifique produto/quantidade!");
+    if(produto.qtd < qtd) return alert("Sem estoque!");
 
     let idComanda = (mesaSel === "Delivery") ? `DELIVERY: ${document.getElementById("nomeCliente").value.trim()}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
     
-    if(mesaSel === "Delivery" && !document.getElementById("nomeCliente").value.trim()){
-        return alert("Para Delivery, o nome do cliente é obrigatório!");
-    }
-
     if(!comandas[idComanda]) {
         comandas[idComanda] = { itens: [], taxa: 0, endereco: "" };
         if(mesaSel === "Delivery") { 
@@ -90,14 +80,7 @@ function adicionarItem(){
         }
     }
 
-    comandas[idComanda].itens.push({ 
-        nome: produto.nome, 
-        qtd, 
-        preco: produto.preco, 
-        total: produto.preco * qtd, 
-        obs: obsItem.value.trim() 
-    });
-
+    comandas[idComanda].itens.push({ nome: produto.nome, qtd, preco: produto.preco, total: produto.preco * qtd, obs: obsItem.value.trim() });
     produto.qtd -= qtd;
     obsItem.value = "";
     
@@ -113,11 +96,11 @@ function fecharMesa(){
     let nomeCli = document.getElementById("nomeCliente")?.value.trim() || "";
     let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
     
-    if(!comandas[idBusca]) return alert("Não há itens nesta conta para fechar.");
+    if(!comandas[idBusca]) return alert("Selecione uma conta aberta.");
     
-    let pag = prompt("Escolha a forma de pagamento:\n1-Dinheiro | 2-Pix | 3-Cartão");
+    let pag = prompt("Pagamento:\n1-Dinheiro | 2-Pix | 3-Cartão");
     let formas = {"1":"Dinheiro", "2":"Pix", "3":"Cartão"};
-    if(!formas[pag]) return alert("Operação cancelada.");
+    if(!formas[pag]) return alert("Cancelado.");
     
     let totalFinal = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0) + (comandas[idBusca].taxa || 0);
     let pedidoID = "#" + Date.now().toString().slice(-6);
@@ -137,59 +120,86 @@ function fecharMesa(){
     
     totalDia += totalFinal;
     delete comandas[idBusca];
-
-    if(mesaSel === "Delivery") {
-        document.getElementById("nomeCliente").value = "";
-        document.getElementById("endCliente").value = "";
-        document.getElementById("taxaEntrega").value = "";
-    }
     
     salvarDados(); 
     renderizarTudo();
 }
 
-// --- FECHAMENTO DE CAIXA COM GERAÇÃO DE CSV ---
-function fecharCaixa(){
-    if(totalDia === 0 && historico.length === 0) return alert("Não há vendas registradas para encerrar o caixa.");
+// --- IMPORTAR CSV (CORRIGIDO) ---
+function importarCSV(event) {
+    const arquivo = event.target.result || event.target.files[0];
+    if (!arquivo) return;
 
-    if(confirm(`Deseja encerrar o caixa e gerar o relatório de vendas?\nTotal acumulado: R$ ${totalDia.toFixed(2)}`)) {
-        
-        // Cabeçalho do CSV
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+        const conteudo = e.target.result;
+        // Divide por linhas e remove o BOM e espaços extras
+        const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
+        let novosItens = [];
+
+        linhas.forEach((linha, index) => {
+            // Pula o cabeçalho, linhas vazias ou a linha de TOTAL
+            if (index === 0 || linha.trim() === "" || linha.includes("TOTAL DO DIA")) return;
+
+            // Regex para separar por ponto-e-vírgula, respeitando o que está entre aspas (os itens)
+            const colunas = linha.match(/(".*?"|[^;]+)/g);
+
+            if (colunas && colunas.length >= 6) {
+                novosItens.push({
+                    id: colunas[0].trim(),
+                    data: colunas[1].trim(),
+                    local: colunas[2].trim(),
+                    pagamento: colunas[3].trim(),
+                    itensVendidos: colunas[4].replace(/"/g, "").trim(),
+                    total: parseFloat(colunas[5].replace(",", "."))
+                });
+            }
+        });
+
+        if (novosItens.length > 0) {
+            if(confirm(`Deseja importar ${novosItens.length} registros para o histórico?`)) {
+                historico = [...historico, ...novosItens];
+                salvarDados();
+                renderizarTudo();
+                alert("Importação concluída!");
+            }
+        } else {
+            alert("Nenhum dado válido encontrado no arquivo!");
+        }
+    };
+    leitor.readAsText(arquivo, "UTF-8");
+    // Reseta o input para permitir importar o mesmo arquivo novamente se necessário
+    event.target.value = "";
+}
+
+// --- FECHAR CAIXA E EXPORTAR CSV ---
+function fecharCaixa(){
+    if(historico.length === 0) return alert("Não há vendas para fechar o caixa.");
+
+    if(confirm(`Encerrar caixa e gerar relatório?\nTotal: R$ ${totalDia.toFixed(2)}`)) {
         let csvContent = "Pedido ID;Data;Local;Pagamento;Itens;Total (R$)\n";
         
-        // Linhas do histórico
         historico.forEach(h => {
             let totalFormatado = h.total.toFixed(2).replace('.', ',');
-            // Envolvemos os itens em aspas para não quebrar com a vírgula/ponto e vírgula
             csvContent += `${h.id};${h.data};${h.local};${h.pagamento};"${h.itensVendidos}";${totalFormatado}\n`;
         });
         
-        // Rodapé com total
         csvContent += `\n; ; ; ;TOTAL DO DIA;${totalDia.toFixed(2).replace('.', ',')}`;
 
-        // Criação do arquivo para download (BOM + Conteúdo)
         const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        const dataArquivo = new Date().toLocaleDateString().replace(/\//g, '-');
-
-        link.setAttribute("href", url);
-        link.setAttribute("download", `vendas_serenada_${dataArquivo}.csv`);
-        document.body.appendChild(link);
+        link.href = URL.createObjectURL(blob);
+        link.download = `caixa_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`;
         link.click();
-        document.body.removeChild(link);
 
-        // Limpa faturamento e histórico após download
         totalDia = 0;
         historico = [];
         salvarDados();
         renderizarTudo();
-        
-        alert("Caixa encerrado e arquivo CSV gerado com sucesso!");
     }
 }
 
-// --- RENDERIZAÇÃO INTERFACE ---
+// --- RENDERIZAÇÃO ---
 function renderizarTudo() {
     atualizarEstoqueUI();
     atualizarPedidoUI();
@@ -200,7 +210,6 @@ function renderizarTudo() {
 function atualizarEstoqueUI(){
     const tab = document.getElementById("tabelaEstoque");
     const sel = document.getElementById("produtoSelect");
-    
     if(tab) {
         tab.innerHTML = "";
         estoque.forEach((p,i) => {
@@ -209,12 +218,9 @@ function atualizarEstoqueUI(){
                 <td><button class="btn-danger" onclick="excluirProduto(${i})">🗑️</button></td></tr>`;
         });
     }
-    
     if(sel) {
         sel.innerHTML = "";
-        estoque.forEach((p,i) => {
-            sel.innerHTML += `<option value="${i}">${p.nome}</option>`;
-        });
+        estoque.forEach((p,i) => { sel.innerHTML += `<option value="${i}">${p.nome}</option>`; });
     }
 }
 
@@ -235,11 +241,11 @@ function atualizarPedidoUI(){
         if(!comandas[id]) return 0;
         comandas[id].itens.forEach((item, index) => {
             subtotal += item.total;
-            itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td class="obs-text">${item.obs || "-"}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
+            itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td>${item.obs || "-"}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
             <td><button class="btn-danger" onclick="removerItem('${id}',${index})">❌</button></td></tr>`;
         });
         if(comandas[id].taxa > 0) {
-            itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>TAXA ENTREGA</td><td colspan="2">${comandas[id].endereco || ""}</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
+            itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>TAXA</td><td colspan="2">${comandas[id].endereco}</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
             subtotal += comandas[id].taxa;
         }
         return subtotal;
@@ -250,24 +256,18 @@ function atualizarPedidoUI(){
     } else {
         totalGeral = renderLinhas(idBusca);
     }
-    
-    const totalDisplay = document.getElementById("totalMesa");
-    if(totalDisplay) totalDisplay.innerHTML = "Total: R$ " + totalGeral.toFixed(2);
+    document.getElementById("totalMesa").innerHTML = "Total: R$ " + totalGeral.toFixed(2);
 }
 
 function atualizarHistoricoUI(){
     const tab = document.getElementById("tabelaHistorico");
     if(!tab) return;
-
     tab.innerHTML = "";
     [...historico].reverse().forEach((p, index) => {
         const realIdx = historico.length - 1 - index; 
-        tab.innerHTML += `
-        <tr>
-            <td>${p.id}</td><td>${p.data}</td><td>${p.local}</td><td>${p.pagamento}</td>
+        tab.innerHTML += `<tr><td>${p.id}</td><td>${p.data}</td><td>${p.local}</td><td>${p.pagamento}</td>
             <td style="color:#03dac6">R$ ${p.total.toFixed(2)}</td>
-            <td><button class="btn-primary" onclick="reimprimirHistorico(${realIdx})">🖨️</button></td>
-        </tr>`;
+            <td><button class="btn-primary" onclick="reimprimirHistorico(${realIdx})">🖨️</button></td></tr>`;
     });
 }
 
@@ -276,11 +276,11 @@ function atualizarTotalDiaUI(){
     if(display) display.innerHTML = "Total: R$ " + totalDia.toFixed(2);
 }
 
-// --- FUNÇÕES DE APOIO ---
+// --- UTILITÁRIOS ---
 function reimprimirHistorico(index) {
-    const p = historico[index];
-    if (!p || !p.dadosCompletos) return alert("Erro ao recuperar dados do pedido.");
-    imprimirCupom(p.id, p.local, p.dadosCompletos, p.total, p.pagamento);
+    const pedido = historico[index];
+    if (!pedido || !pedido.dadosCompletos) return alert("Sem detalhes para impressão.");
+    imprimirCupom(pedido.id, pedido.local, pedido.dadosCompletos, pedido.total, pedido.pagamento);
 }
 
 function toggleCliente() {
@@ -294,39 +294,28 @@ function toggleCliente() {
 
 function removerItem(id, idx){
     let item = comandas[id].itens[idx];
-    let p = estoque.find(prod => prod.nome === item.nome);
+    let p = estoque.find(p=>p.nome===item.nome);
     if(p) p.qtd += item.qtd;
     comandas[id].itens.splice(idx,1);
-    if(comandas[id].itens.length === 0 && !comandas[id].taxa) delete comandas[id];
-    salvarDados(); 
-    renderizarTudo();
+    if(comandas[id].itens.length===0) delete comandas[id];
+    salvarDados(); renderizarTudo();
 }
 
 function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
     let janela = window.open("", "", "width=300,height=600");
-    let cupom = `<pre style="font-family:monospace; font-size:12px;">SERENADA PUB & BURGER\n----------------------------\nID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
-    obj.itens.forEach(i => { 
-        cupom += `${i.qtd}x ${i.nome.padEnd(14)} R$${i.total.toFixed(2)}\n`; 
-        if(i.obs) cupom += `   * ${i.obs}\n`;
-    });
-    if(obj.taxa > 0) cupom += `----------------------------\nTAXA: R$ ${obj.taxa.toFixed(2)}\n`;
-    cupom += `----------------------------\nTOTAL: R$ ${total.toFixed(2)}\nPGTO: ${formaPag}\n----------------------------\nObrigado pela preferência!\n</pre>`;
-    
-    janela.document.write(cupom);
-    janela.document.close();
+    let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\n----------------------------\nID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
+    obj.itens.forEach(i => { cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; });
+    cupom += `----------------------------\nTOTAL: R$ ${total.toFixed(2)}\nPGTO: ${formaPag}\n----------------------------\n</pre>`;
+    janela.document.write(cupom); janela.document.close();
     setTimeout(() => { janela.print(); janela.close(); }, 500);
 }
 
 function zerarSistema() {
     if(prompt("Senha Mestre:") === SENHA_SISTEMA) {
-        if(confirm("ATENÇÃO: Isso apagará TODO o estoque e histórico. Deseja continuar?")) {
-            localStorage.clear();
-            location.reload();
-        }
-    } else alert("Senha incorreta!");
+        if(confirm("Apagar tudo?")) { localStorage.clear(); location.reload(); }
+    }
 }
 
-// --- INICIALIZAÇÃO ---
 window.onload = () => {
     const mSelect = document.getElementById("mesaSelect");
     if(mSelect) {
