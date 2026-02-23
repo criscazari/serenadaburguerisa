@@ -58,7 +58,7 @@
                 <div id="totalDia" style="font-size: 1.5em; color: #03dac6;">Total: R$ 0.00</div>
             </div>
             <div>
-                <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+                <button class="btn-primary" onclick="gerarRelatorioExcel()">📊 Relatório Excel</button>
                 <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
             </div>
         </div>
@@ -82,7 +82,7 @@
             </div>
             <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
             <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
-            <button class="btn-gray" style="margin-top:10px" onclick="limparHistoricoVisual()">🧹 Limpar Lista</button>
+           <!-- <button class="btn-gray" style="margin-top:10px" onclick="limparHistoricoVisual()">🧹 Limpar Lista</button> -->
         </div>
     </div>
     <script src="script.js"></script>

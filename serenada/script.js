@@ -276,7 +276,51 @@ function atualizarTotalDiaUI(){
     if(display) display.innerHTML = "Total: R$ " + totalDia.toFixed(2);
 }
 
+function exportarEstoque(){
+    if(estoque.length === 0) return alert("Não há produtos no estoque.");
+
+    let csv = "Produto;Preco;Quantidade\n";
+
+    estoque.forEach(p => {
+        csv += `${p.nome};${p.preco.toFixed(2).replace(".", ",")};${p.qtd}\n`;
+    });
+
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", "estoque_serenada.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 // --- UTILITÁRIOS ---
+function gerarRelatorioExcel(){
+    if(historico.length === 0) return alert("Não há vendas registradas.");
+
+    let csv = "RELATÓRIO DE VENDAS - SERENADA PUB & BURGER\n\n";
+    csv += "Pedido ID;Data;Local;Pagamento;Itens;Total (R$)\n";
+
+    historico.forEach(h => {
+        csv += `${h.id};${h.data};${h.local};${h.pagamento};"${h.itensVendidos}";${h.total.toFixed(2).replace(".", ",")}\n`;
+    });
+
+    csv += `\n;;;;TOTAL DO DIA;${totalDia.toFixed(2).replace(".", ",")}`;
+
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    const dataArquivo = new Date().toLocaleDateString().replace(/\//g, "-");
+
+    link.setAttribute("href", url);
+    link.setAttribute("download", `relatorio_serenada_${dataArquivo}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
 function reimprimirHistorico(index) {
     const pedido = historico[index];
     if (!pedido || !pedido.dadosCompletos) return alert("Sem detalhes para impressão.");
