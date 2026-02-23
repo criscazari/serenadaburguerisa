@@ -207,6 +207,15 @@ function atualizarHistoricoUI(){
     });
 }
 
+// FUNÇÃO MOVIDA PARA FORA (CORRETO)
+function reimprimirHistorico(index) {
+    const pedido = historico[index];
+    if (!pedido || !pedido.dadosCompletos) {
+        return alert("Erro: Registro sem detalhes para reimpressão.");
+    }
+    imprimirCupom(pedido.id, pedido.local, pedido.dadosCompletos, pedido.total, pedido.pagamento);
+}
+
 function atualizarTotalDiaUI(){
     const display = document.getElementById("totalDia");
     if(display) display.innerHTML = "Total: R$ " + totalDia.toFixed(2);
@@ -238,9 +247,18 @@ function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
     let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\n----------------------------\nID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
     obj.itens.forEach(i => { 
         cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; 
+        if(i.obs) cupom += `   * Obs: ${i.obs}\n`;
     });
+    if(obj.taxa > 0) cupom += `----------------------------\nTAXA: R$ ${obj.taxa.toFixed(2)}\n`;
     cupom += `----------------------------\nTOTAL: R$ ${total.toFixed(2)}\nPGTO: ${formaPag}\n----------------------------\n</pre>`;
-    janela.document.write(cupom); janela.print(); janela.close();
+    
+    janela.document.write(cupom);
+    janela.document.close(); // Fecha o documento para permitir a impressão
+    
+    setTimeout(() => {
+        janela.print();
+        janela.close();
+    }, 500);
 }
 
 function zerarSistema() {
@@ -254,7 +272,6 @@ function zerarSistema() {
 
 // --- INICIALIZAÇÃO AO CARREGAR PÁGINA ---
 window.onload = () => {
-    // Popula o select de mesas se ele existir na página
     const mSelect = document.getElementById("mesaSelect");
     if(mSelect) {
         mSelect.innerHTML = `<option value="todas">Ver Todas</option><option value="Balcão">📍 Balcão</option><option value="Delivery">🛵 Delivery</option>`;
