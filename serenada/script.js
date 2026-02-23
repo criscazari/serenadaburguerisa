@@ -181,37 +181,33 @@ function importarCSVEstoque(event) {
     leitor.onload = function(e) {
         const conteudo = e.target.result;
 
-        // Remove BOM e divide linhas
-        const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
+        // Remove BOM e divide corretamente as linhas
+        const linhas = conteudo.replace(/\ufeff/g, "").split(/\r?\n/);
 
         let novosItens = 0;
 
         linhas.forEach((linha, index) => {
 
             linha = linha.trim();
-
-            // Pula cabeçalho e linhas vazias
             if (index === 0 || linha === "") return;
 
-            // Divide respeitando texto entre aspas
-            const colunas = linha.match(/(".*?"|[^;]+)/g);
+            const colunas = linha.split(";");
 
-            if (colunas && colunas.length >= 3) {
+            if (colunas.length >= 3) {
 
-                const nome = colunas[0].replace(/"/g, "").trim();
+                const nome = colunas[0].trim();
                 const preco = parseFloat(colunas[1].replace(",", ".").trim());
                 const qtd = parseInt(colunas[2].trim());
 
                 if (!isNaN(preco) && !isNaN(qtd)) {
 
-                    // Verifica se já existe no estoque
                     const existente = estoque.find(p =>
                         p.nome.toLowerCase() === nome.toLowerCase()
                     );
 
                     if (existente) {
-                        existente.qtd += qtd;   // soma quantidade
-                        existente.preco = preco; // atualiza preço
+                        existente.qtd += qtd;
+                        existente.preco = preco;
                     } else {
                         estoque.push({ nome, preco, qtd });
                     }
@@ -226,13 +222,11 @@ function importarCSVEstoque(event) {
             renderizarTudo();
             alert("Estoque importado com sucesso!");
         } else {
-            alert("Nenhum dado válido encontrado no arquivo!");
+            alert("Nenhum dado válido encontrado!");
         }
     };
 
     leitor.readAsText(arquivo, "UTF-8");
-
-    // Permite importar o mesmo arquivo novamente
     event.target.value = "";
 }
 
