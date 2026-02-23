@@ -1,0 +1,202 @@
+:root{
+    --bg:#121212;
+    --card:#1e1e1e;
+    --section:#2a2a2a;
+    --text:#ffffff;
+    --primary:#ea1d2c;
+    --danger:#ff5252;
+    --warning:#ffb100;
+    --border:#444;
+}
+
+body.light{
+    --bg:#f5f5f5;
+    --card:#ffffff;
+    --section:#ffffff;
+    --text:#222;
+    --primary:#ea1d2c;
+    --danger:#d32f2f;
+    --warning:#f57c00;
+    --border:#ddd;
+}
+
+body{
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    transition:0.3s;
+}
+
+/* CONTAINER PRINCIPAL */
+.container{
+    max-width:1100px;
+    margin:15px auto;
+    background:var(--card);
+    padding:20px;
+    border-radius:14px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.3);
+    transition:0.3s;
+}
+
+/* TÍTULO */
+h1{
+    text-align:center;
+    color:var(--primary);
+    font-size:1.6rem;
+}
+
+/* SEÇÕES */
+.section{
+    margin-top:25px;
+    padding:18px;
+    background:var(--section);
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.15);
+    transition:0.3s;
+}
+
+/* INPUTS */
+input, select{
+    padding:10px;
+    margin:6px 0;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:transparent;
+    color:var(--text);
+    width:100%;
+    box-sizing:border-box;
+}
+
+input:focus, select:focus{
+    border-color:var(--primary);
+    outline:none;
+}
+
+/* BOTÕES */
+button{
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    opacity:0.9;
+}
+
+.btn-primary{ background:var(--primary); color:white; }
+.btn-danger{ background:var(--danger); color:white; }
+.btn-warning{ background:var(--warning); color:black; }
+.btn-close{ background:#ff4081; color:white; }
+
+/* TABELAS */
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    min-width:600px;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+th, td{
+    padding:8px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    font-size:0.9rem;
+}
+
+th{
+    color:var(--primary);
+}
+
+/* Estoque com fonte menor */
+#tabelaEstoque td{
+    font-size:0.85rem;
+}
+
+/* Botões menores do estoque */
+td button{
+    padding:4px 8px;
+    font-size:0.75rem;
+}
+
+/* Total */
+.total{
+    font-size:1.3rem;
+    font-weight:bold;
+    color:var(--primary);
+    text-align:right;
+}
+
+/* Logo */
+.logo-container{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.logo-container img{
+    width:65px;
+}
+
+/* Botão de alternar tema */
+.theme-toggle{
+    position:fixed;
+    top:15px;
+    right:15px;
+    background:var(--primary);
+    color:white;
+    padding:8px 12px;
+    border-radius:20px;
+    font-size:0.8rem;
+    z-index:999;
+}
+
+/* Histórico */
+.historico-row{
+    font-size:0.85rem;
+}
+
+/* RESPONSIVIDADE */
+@media(max-width:768px){
+
+    .container{
+        margin:10px;
+        padding:15px;
+    }
+
+    .section[style*="display: flex"]{
+        flex-direction:column !important;
+        align-items:flex-start !important;
+        gap:10px;
+    }
+
+    .section[style*="display: flex"] button{
+        width:100%;
+    }
+}
+
+@media(max-width:480px){
+
+    th,td{
+        font-size:0.8rem;
+        padding:6px;
+    }
+
+    button{
+        font-size:0.8rem;
+        padding:6px 8px;
+    }
+
+    .logo-container img{
+        width:55px;
+    }
+}
