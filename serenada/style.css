@@ -14,7 +14,7 @@ body{
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-/* NOVO LAYOUT DO CABEÇALHO */
+/* NOVO LAYOUT DO CABEcALHO */
 .logo-container {
     display: grid;
     grid-template-columns: 100px 1fr 100px; /* Coluna logo, centro flexível, coluna equilíbrio */

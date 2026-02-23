@@ -172,6 +172,85 @@ function importarCSV(event) {
     event.target.value = "";
 }
 
+// --- IMPORTAR ESTOQUE ---
+function importarCSVEstoque(event) {
+    const arquivo = event.target.files[0];
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+
+    leitor.onload = function(e) {
+        const conteudo = e.target.result;
+
+        // Remove BOM e divide linhas
+        const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
+
+        let novosItens = [];
+
+        linhas.forEach((linha, index) => {
+
+            linha = linha.trim();
+
+            // Ignora cabeçalho ou linha vazia
+            if (index === 0 || linha === "") return;
+
+            const colunas = linha.match(/(".*?"|[^;]+)/g);
+
+            if (colunas && colunas.length >= 5) {
+
+                const precoConvertido = parseFloat(
+                    colunas[3].replace(",", ".").trim()
+                );
+
+                const quantidadeConvertida = parseInt(
+                    colunas[4].trim()
+                );
+
+                if (!isNaN(precoConvertido) && !isNaN(quantidadeConvertida)) {
+
+                    novosItens.push({
+                        id: colunas[0].trim(),
+                        nome: colunas[1].replace(/"/g, "").trim(),
+                        categoria: colunas[2].trim(),
+                        preco: precoConvertido,
+                        quantidade: quantidadeConvertida
+                    });
+
+                }
+            }
+        });
+
+        if (novosItens.length > 0) {
+
+            if (confirm(`Deseja importar ${novosItens.length} itens para o estoque?`)) {
+
+                // 🔎 Evita duplicação por ID
+                novosItens = novosItens.filter(novo =>
+                    !estoque.some(item => item.id === novo.id)
+                );
+
+                estoque = [...estoque, ...novosItens];
+
+                localStorage.setItem("estoque", JSON.stringify(estoque));
+
+                if (typeof renderizarEstoque === "function") {
+                    renderizarEstoque();
+                }
+
+                alert("Estoque importado com sucesso!");
+            }
+
+        } else {
+            alert("Nenhum item válido encontrado no arquivo!");
+        }
+    };
+
+    leitor.readAsText(arquivo, "UTF-8");
+
+    // Permite importar o mesmo arquivo novamente
+    event.target.value = "";
+}
+
 // --- FECHAR CAIXA E EXPORTAR CSV ---
 function fecharCaixa(){
     if(historico.length === 0) return alert("Não há vendas para fechar o caixa.");
