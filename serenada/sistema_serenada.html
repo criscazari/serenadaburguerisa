@@ -103,6 +103,16 @@ th { background: #333; color: #03dac6; }
     font-size: 0.9em;
     color: #ccc;
 }
+
+.logo-container {
+    display: flex;
+    align-items: center;   /* Alinha verticalmente */
+    gap: 15px;             /* Espaço entre logo e texto */
+}
+
+.logo-container img {
+    width: 60px;           /* Ajuste o tamanho se quiser */
+}
 </style>
 </head>
 <body>
@@ -114,9 +124,11 @@ th { background: #333; color: #03dac6; }
 </div>
 
 <div class="container">
-    <img src="icon-192.png" alt="Logo" style="display:block; margin: 0 auto 20px; width:80px;">
-    
-    <h1>SERENADA PUB & BURGER</h1>
+    <div class="logo-container">
+        <img src="icon-192.png" alt="Logo">
+  
+        <h1>SERENADA PUB & BURGER</h1>
+    </div>
 
     <div class="section">
         <h3>📦 Cadastro de Estoque</h3>
