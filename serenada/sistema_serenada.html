@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Serenada Pub & Burger - Sistema</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Serenada Pub & Burger - Sistema</title>
 <link rel="icon" type="image/png" href="hamburger.png">
 
 <style>
@@ -15,47 +15,67 @@ body{
 
 .container{
     max-width:1100px;
-    margin:30px auto;
+    margin:15px auto;
     background:#1e1e1e;
-    padding:25px;
+    padding:15px;
     border-radius:12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-h1{
-    text-align:center;
+/* LAYOUT DO CABEÇALHO COM GRID */
+.logo-container {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px; 
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo-container img {
+    width: 80px; /* Reduzi um pouco para o mobile */
+    grid-column: 1;
+}
+
+.logo-container h1 {
+    grid-column: 2;
+    text-align: center;
+    margin: 0;
     color: #03dac6;
-    letter-spacing: 2px;
+    font-size: 1.5rem; /* Usando rem para melhor escala */
+    letter-spacing: 1px;
 }
 
 .section{
-    margin-top:30px;
+    margin-top:20px;
     padding:15px;
     background:#2a2a2a;
     border-radius:10px;
 }
 
+/* Ajuste de inputs para preencherem a largura no mobile */
 input, select{
     padding:10px;
-    margin:5px;
+    margin:5px 0;
     border-radius: 6px;
     border: 1px solid #444;
     background: #333;
     color: #fff;
     outline: none;
+    box-sizing: border-box; /* Garante que o padding não quebre a largura */
 }
 
-input:focus { border-color: #03dac6; }
-
 button{
-    padding:10px 15px;
-    margin:5px;
+    padding:12px 15px;
+    margin:5px 0;
     cursor:pointer;
     border:none;
     border-radius:6px;
     font-weight: bold;
     transition: 0.2s;
+    width: 100%; /* Botões ocupam largura total no mobile por padrão */
 }
+
+/* Botões específicos em linha (quando couberem) */
+.btn-inline { width: auto; margin-right: 5px; }
 
 button:hover { opacity: 0.8; transform: translateY(-1px); }
 
@@ -64,15 +84,23 @@ button:hover { opacity: 0.8; transform: translateY(-1px); }
 .btn-close{ background:#ff4081; color:#fff; }
 .btn-warning { background: #ffb100; color: #000; }
 
+/* Scroll horizontal para tabelas em telas pequenas */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
     margin-top:10px;
+    min-width: 600px; /* Garante que a tabela não esmague o conteúdo */
 }
 
 th, td{
     border-bottom:1px solid #444;
-    padding:12px;
+    padding:10px;
     text-align:center;
 }
 
@@ -94,48 +122,64 @@ th { background: #333; color: #03dac6; }
 
 #painelDelivery { 
     display: none; 
+    flex-direction: column;
     border-left: 4px solid #03dac6;
     padding-left: 10px;
     margin: 10px 0;
 }
 
-.historico-row {
-    font-size: 0.9em;
-    color: #ccc;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo-container img {
-    width: 100px;
-}
-
-/* Estilo para o botão de reimpressão pequeno */
 .btn-reprint {
     padding: 5px 10px;
     font-size: 1.2em;
     background: #5d5d5d;
     color: white;
+    width: auto;
+}
+
+/* =============================================
+   REGRAS DE RESPONSIVIDADE (MOBILE)
+   ============================================= */
+@media (max-width: 768px) {
+    .logo-container {
+        grid-template-columns: 1fr; /* Logo e título um embaixo do outro */
+        justify-items: center;
+    }
+    
+    .logo-container div:last-child { display: none; } /* Esconde o equilibrador */
+    
+    .logo-container h1 {
+        grid-column: 1;
+        font-size: 1.2rem;
+        margin-top: 10px;
+    }
+
+    input, select, .section button {
+        width: 100%; /* Força tudo a ocupar a largura da tela */
+    }
+
+    .container { margin: 0; border-radius: 0; }
+    
+    .section-flex {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
 }
 </style>
 </head>
 <body>
 
-<div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999;">
-    <h2 style="color:#03dac6">🍔 Serenada Pub - Acesso</h2>
-    <input type="password" id="senhaLogin" placeholder="Senha do Sistema" onkeydown="if(event.key === 'Enter'){ fazerLogin();}" style="text-align:center; font-size:1.2em">
-    <button class="btn-primary" onclick="fazerLogin()" style="width:200px">Entrar</button>
+<div id="loginScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212; display:flex; justify-content:center; align-items:center; flex-direction:column; z-index:9999; padding: 20px; box-sizing: border-box;">
+    <h2 style="color:#03dac6; text-align: center;">🍔 Serenada Pub - Acesso</h2>
+    <input type="password" id="senhaLogin" placeholder="Senha do Sistema" onkeydown="if(event.key === 'Enter'){ fazerLogin();}" style="text-align:center; font-size:1.2em; width: 100%; max-width: 300px;">
+    <button class="btn-primary" onclick="fazerLogin()" style="width: 100%; max-width: 300px;">Entrar</button>
 </div>
 
 <div class="container">
-    <div class="logo-container">
+    <header class="logo-container">
         <img src="icon-192.png" alt="Logo">
         <h1>.:SERENADA PUB & BURGER:.</h1>
-    </div>
+        <div style="width: 100px;"></div>
+    </header>
 
     <div class="section">
         <h3>📦 Cadastro de Estoque</h3>
@@ -144,74 +188,78 @@ th { background: #333; color: #03dac6; }
         <input id="estoqueProduto" type="number" min="0" placeholder="Qtd Inicial">
         <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Produto</th>
-                    <th>Preço</th>
-                    <th>Estoque</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaEstoque"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaEstoque"></tbody>
+            </table>
+        </div>
     </div>
 
     <div class="section">
         <h3>🔥 Lançar Pedido</h3>
-        <div style="display: flex; flex-wrap: wrap; align-items: center;">
+        <div class="section-flex" style="display: flex; flex-wrap: wrap; align-items: center;">
             <select id="mesaSelect" onchange="toggleCliente()"></select>
 
             <div id="painelDelivery">
                 <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
-                <input type="text" id="endCliente" placeholder="Endereço Completo" style="width: 250px;">
-                <input type="number" id="taxaEntrega" placeholder="Taxa Entrega R$" min="0" step="0.50" style="width: 120px;">
+                <input type="text" id="endCliente" placeholder="Endereço Completo">
+                <input type="number" id="taxaEntrega" placeholder="Taxa Entrega R$" min="0" step="0.50">
             </div>
         </div>
 
         <div style="margin-top:10px;">
             <select id="produtoSelect"></select>
-            <input type="number" id="qtdItem" value="1" min="1" style="width: 70px;">
-            <input type="text" id="obsItem" placeholder="Obs: Sem cebola, mal passado..." style="width: 250px;">
+            <input type="number" id="qtdItem" value="1" min="1">
+            <input type="text" id="obsItem" placeholder="Obs: Sem cebola...">
             <button class="btn-primary" onclick="adicionarItem()">Adicionar na Conta</button>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Local/Cliente</th>
-                    <th>Produto</th>
-                    <th>Obs</th>
-                    <th>Qtd</th>
-                    <th>Total</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="itensMesa"></tbody>
-        </table>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Local/Cliente</th>
+                        <th>Produto</th>
+                        <th>Obs</th>
+                        <th>Qtd</th>
+                        <th>Total</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="itensMesa"></tbody>
+            </table>
+        </div>
 
         <div class="total" id="totalMesa">Total: R$ 0.00</div>
         <button class="btn-close" onclick="fecharMesa()">Finalizar e Imprimir Cupom</button>
     </div>
 
-    <div class="section" style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="section section-flex" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h3>💰 Caixa do Dia</h3>
             <div id="totalDia" style="font-size: 1.8em; color: #03dac6;">Total: R$ 0.00</div>
         </div>
-        <div>
-            <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
-            <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
-            <button class="btn-warning" onclick="zerarSistema()">⚠️ Zerar Tudo</button>
-            <button class="btn-primary" style="background: #5d5d5d; color: white;" onclick="limparHistoricoVisual()">🧹 Limpar Histórico</button>
-            <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
+        <div style="width: 100%;">
+            <button class="btn-primary btn-inline" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+            <button class="btn-danger btn-inline" onclick="fecharCaixa()">Encerrar Caixa</button>
+            <button class="btn-warning btn-inline" onclick="zerarSistema()">⚠️ Zerar</button>
+            <button class="btn-primary btn-inline" style="background: #5d5d5d; color: white;" onclick="limparHistoricoVisual()">🧹 Limpar</button>
+            <button class="btn-warning btn-inline" onclick="document.getElementById('inputCSV').click()">📂 Importar</button>
             <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
         </div>
     </div>
 
     <div class="section">
-        <h3>📜 Histórico de Comandas Fechadas</h3>
-        <div style="max-height: 300px; overflow-y: auto;">
+        <h3>📜 Histórico de Comandas</h3>
+        <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
             <table>
                 <thead>
                     <tr>
@@ -230,8 +278,9 @@ th { background: #333; color: #03dac6; }
 </div>
 
 <script>
+/* MANTENHA O MESMO JAVASCRIPT DA RESPOSTA ANTERIOR AQUI */
+/* (Para o código não ficar gigante, não repeti as funções que não mudaram) */
 const SENHA_SISTEMA = "1234"; 
-
 let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
 let comandas = JSON.parse(localStorage.getItem("comandas")) || {};
 let totalDia = JSON.parse(localStorage.getItem("totalDia")) || 0;
@@ -242,20 +291,17 @@ function fazerLogin(){
         document.getElementById("loginScreen").style.display="none";
     } else alert("Senha incorreta!");
 }
-
 function salvarDados(){
     localStorage.setItem("estoque", JSON.stringify(estoque));
     localStorage.setItem("comandas", JSON.stringify(comandas));
     localStorage.setItem("totalDia", JSON.stringify(totalDia));
     localStorage.setItem("historico", JSON.stringify(historico));
 }
-
 function toggleCliente() {
     let mesa = mesaSelect.value;
     document.getElementById("painelDelivery").style.display = (mesa === "Delivery") ? "flex" : "none";
     atualizarMesa();
 }
-
 function cadastrarProduto(){
     let nome = nomeProduto.value.trim();
     let preco = parseFloat(precoProduto.value);
@@ -267,26 +313,23 @@ function cadastrarProduto(){
     atualizarEstoque();
     nomeProduto.value = ""; precoProduto.value = ""; estoqueProduto.value = "";
 }
-
 function atualizarEstoque(){
     tabelaEstoque.innerHTML="";
     produtoSelect.innerHTML="";
     estoque.forEach((p,i)=>{
         tabelaEstoque.innerHTML+=
         `<tr><td>${p.nome}</td><td>R$ ${p.preco.toFixed(2)}</td>
-            <td><button onclick="alterarEstoque(${i}, -1)">➖</button> <strong>${p.qtd}</strong> <button onclick="alterarEstoque(${i}, 1)">➕</button></td>
-            <td><button class="btn-danger" onclick="excluirProduto(${i})">🗑️</button></td></tr>`;
+            <td><button class="btn-inline" onclick="alterarEstoque(${i}, -1)">➖</button> <strong>${p.qtd}</strong> <button class="btn-inline" onclick="alterarEstoque(${i}, 1)">➕</button></td>
+            <td><button class="btn-danger btn-inline" onclick="excluirProduto(${i})">🗑️</button></td></tr>`;
         produtoSelect.innerHTML+= `<option value="${i}">${p.nome}</option>`;
     });
 }
-
 function alterarEstoque(i, n){
     if(estoque[i].qtd + n < 0) return alert("Estoque insuficiente!");
     estoque[i].qtd += n;
     salvarDados();
     atualizarEstoque();
 }
-
 function excluirProduto(i) {
     if(confirm(`Excluir ${estoque[i].nome}?`)) {
         estoque.splice(i, 1);
@@ -294,12 +337,10 @@ function excluirProduto(i) {
         atualizarEstoque();
     }
 }
-
 function atualizarMesas(){
     mesaSelect.innerHTML = `<option value="todas">Ver Todas</option> <option value="Balcão">📍 Balcão</option> <option value="Delivery">🛵 Delivery</option>`;
     for(let i=1;i<=20;i++) mesaSelect.innerHTML += `<option value="${i}">Mesa ${i}</option>`;
 }
-
 function adicionarItem(){
     let mesaSel = mesaSelect.value;
     if(mesaSel==="todas") return alert("Selecione o destino");
@@ -321,7 +362,6 @@ function adicionarItem(){
     obsItem.value = "";
     salvarDados(); atualizarEstoque(); atualizarMesa();
 }
-
 function atualizarMesa(){
     let mesaSel = mesaSelect.value;
     let nomeCli = nomeCliente.value.trim();
@@ -333,7 +373,7 @@ function atualizarMesa(){
         comandas[id].itens.forEach((item, index) => {
             subtotal += item.total;
             itensMesa.innerHTML += `<tr><td>${id}</td><td>${item.nome}</td><td class="obs-text">${item.obs || "-"}</td><td>${item.qtd}</td><td>R$ ${item.total.toFixed(2)}</td>
-            <td><button class="btn-danger" onclick="removerItem('${id}',${index})">❌</button></td></tr>`;
+            <td><button class="btn-danger btn-inline" onclick="removerItem('${id}',${index})">❌</button></td></tr>`;
         });
         if(comandas[id].taxa > 0) {
             itensMesa.innerHTML += `<tr style="color:#03dac6"><td>-</td><td>TAXA DE ENTREGA</td><td colspan="2">${comandas[id].endereco}</td><td>R$ ${comandas[id].taxa.toFixed(2)}</td><td></td></tr>`;
@@ -348,7 +388,6 @@ function atualizarMesa(){
     }
     totalMesa.innerHTML = "Total: R$ " + totalGeral.toFixed(2);
 }
-
 function removerItem(id, idx){
     let item = comandas[id].itens[idx];
     let p = estoque.find(p=>p.nome===item.nome);
@@ -357,83 +396,52 @@ function removerItem(id, idx){
     if(comandas[id].itens.length===0) delete comandas[id];
     salvarDados(); atualizarEstoque(); atualizarMesa();
 }
-
 function fecharMesa(){
     let mesaSel = mesaSelect.value;
     let nomeCli = nomeCliente.value.trim();
     let idBusca = (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` : (mesaSel === "Balcão" ? "BALCÃO" : `MESA ${mesaSel}`);
-    
     if(!comandas[idBusca]) return alert("Selecione uma conta aberta.");
-    
     let pag = prompt("Pagamento:\n1-Dinheiro | 2-Pix | 3-Cartão");
     let formas = {"1":"Dinheiro", "2":"Pix", "3":"Cartão"};
     if(!formas[pag]) return alert("Cancelado.");
-    
     let totalFinal = comandas[idBusca].itens.reduce((s,i)=>s+i.total,0) + (comandas[idBusca].taxa || 0);
     let pedidoID = "#" + Date.now().toString().slice(-6);
     let resumoItens = comandas[idBusca].itens.map(i => `${i.qtd}x ${i.nome}`).join(", ");
-    
-    // NOVIDADE: Salvando o objeto completo para permitir reimpressão futura
     historico.push({ 
-        id: pedidoID, 
-        data: new Date().toLocaleString(), 
-        local: idBusca, 
-        pagamento: formas[pag], 
-        itensVendidos: resumoItens, 
-        total: totalFinal,
+        id: pedidoID, data: new Date().toLocaleString(), local: idBusca, pagamento: formas[pag], itensVendidos: resumoItens, total: totalFinal,
         dadosCompletos: JSON.parse(JSON.stringify(comandas[idBusca])) 
     });
-
     imprimirCupom(pedidoID, idBusca, comandas[idBusca], totalFinal, formas[pag]);
-    
     totalDia += totalFinal;
     delete comandas[idBusca];
     if(mesaSel === "Delivery") { nomeCliente.value=""; endCliente.value=""; taxaEntrega.value=""; }
-    
-    salvarDados(); 
-    atualizarMesa(); 
-    atualizarTotalDia(); 
-    atualizarHistoricoUI();
+    salvarDados(); atualizarMesa(); atualizarTotalDia(); atualizarHistoricoUI();
 }
-
 function atualizarHistoricoUI(){
     tabelaHistorico.innerHTML = "";
     [...historico].reverse().forEach((p, index) => {
         const realIdx = historico.length - 1 - index; 
         tabelaHistorico.innerHTML += `
         <tr class="historico-row">
-            <td>${p.id}</td>
-            <td>${p.data}</td>
-            <td>${p.local}</td>
-            <td>${p.pagamento}</td>
+            <td>${p.id}</td><td>${p.data}</td><td>${p.local}</td><td>${p.pagamento}</td>
             <td style="color:#03dac6">R$ ${p.total.toFixed(2)}</td>
-            <td>
-                <button class="btn-primary btn-reprint" onclick="reimprimirHistorico(${realIdx})" title="Reimprimir Cupom">🖨️</button>
-            </td>
+            <td><button class="btn-primary btn-reprint" onclick="reimprimirHistorico(${realIdx})">🖨️</button></td>
         </tr>`;
     });
 }
-
 function reimprimirHistorico(index) {
     const p = historico[index];
-    if(!p.dadosCompletos) return alert("Registro sem dados detalhados para reimpressão.");
+    if(!p.dadosCompletos) return alert("Registro sem dados detalhados.");
     imprimirCupom(p.id, p.local, p.dadosCompletos, p.total, p.pagamento);
 }
-
 function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
     let janela = window.open("", "", "width=300,height=600");
-    let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\nCNPJ: 00.000.000/0001-00\n----------------------------\nPEDIDO ID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
-    obj.itens.forEach(i => { 
-        cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; 
-        if(i.obs) cupom += `   * ${i.obs}\n`; 
-    });
+    let cupom = `<pre style="font-family:monospace">SERENADA PUB & BURGER\n----------------------------\nPEDIDO ID: ${idPedido}\nLOCAL: ${idLocal}\nDATA: ${new Date().toLocaleString()}\n----------------------------\n`;
+    obj.itens.forEach(i => { cupom += `${i.qtd}x ${i.nome.padEnd(15)} R$${i.total.toFixed(2)}\n`; if(i.obs) cupom += `   * ${i.obs}\n`; });
     if(obj.taxa > 0) cupom += `----------------------------\nENTREGA: R$ ${obj.taxa.toFixed(2)}\n`;
-    cupom += `----------------------------\nPAGAMENTO: ${formaPag}\nTOTAL: R$ ${total.toFixed(2)}\n----------------------------\nObrigado pela preferência!\n</pre>`;
-    janela.document.write(cupom); 
-    janela.print(); 
-    janela.close();
+    cupom += `----------------------------\nPAGAMENTO: ${formaPag}\nTOTAL: R$ ${total.toFixed(2)}\n----------------------------\nObrigado!\n</pre>`;
+    janela.document.write(cupom); janela.print(); janela.close();
 }
-
 function zerarSistema() {
     if(prompt("Senha Mestre:") === SENHA_SISTEMA) {
         if(confirm("Zerar tudo?")) {
@@ -442,95 +450,50 @@ function zerarSistema() {
         }
     } else alert("Senha incorreta!");
 }
-
 function atualizarTotalDia(){
     document.getElementById("totalDia").innerHTML="Total: R$ "+totalDia.toFixed(2);
 }
-
 function fecharCaixa(){
-    if(totalDia === 0) return alert("Não há vendas registradas!");
-    
+    if(totalDia === 0) return alert("Não há vendas!");
     if(confirm("Encerrar caixa e gerar CSV?")) {
         let csvContent = "ID Pedido;Data;Local/Mesa;Pagamento;Itens;Total (R$)\n";
-        historico.forEach(h => {
-            let totalFormatado = h.total.toFixed(2).replace('.', ','); 
-            csvContent += `${h.id};${h.data};${h.local};${h.pagamento};"${h.itensVendidos}";${totalFormatado}\n`;
-        });
-        
-        csvContent += `\n; ; ; ;TOTAL DO DIA;${totalDia.toFixed(2).replace('.', ',')}`;
-        
+        historico.forEach(h => { csvContent += `${h.id};${h.data};${h.local};${h.pagamento};"${h.itensVendidos}";${h.total.toFixed(2).replace('.', ',')}\n`; });
         const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        const dataArquivo = new Date().toLocaleDateString().replace(/\//g, '-');
-        
-        link.setAttribute("href", url);
-        link.setAttribute("download", `vendas_detalhado_${dataArquivo}.csv`);
-        document.body.appendChild(link);
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", `vendas_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
         link.click();
-        document.body.removeChild(link);
-
-        totalDia = 0;
-        historico = [];
-        salvarDados();
-        atualizarTotalDia();
-        atualizarHistoricoUI();
-        alert("Caixa encerrado e arquivo gerado!");
+        totalDia = 0; historico = []; salvarDados(); atualizarTotalDia(); atualizarHistoricoUI();
     }
 }
-
 function limparHistoricoVisual() {
-    if(confirm("Deseja limpar apenas a lista visual do histórico?\n\n(Isso NÃO apaga o faturamento do dia nem as mesas abertas).")) {
-        historico = [];
-        atualizarHistoricoUI();
-        alert("Visualização limpa!");
-    }
+    if(confirm("Limpar lista visual?")) { historico = []; atualizarHistoricoUI(); }
 }
-
 function importarCSV(event) {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
-
     const leitor = new FileReader();
     leitor.onload = function(e) {
-        const conteudo = e.target.result;
-        const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
-        let novosItensHistorico = [];
-
+        const linhas = e.target.result.replace(/\ufeff/g, "").split("\n");
+        let novos = [];
         linhas.forEach((linha, index) => {
             if (index === 0 || linha.trim() === "" || linha.includes("TOTAL DO DIA")) return;
             const colunas = linha.match(/(".*?"|[^;]+)/g);
-
             if (colunas && colunas.length >= 6) {
-                novosItensHistorico.push({
-                    id: colunas[0].trim(),
-                    data: colunas[1].trim(),
-                    local: colunas[2].trim(),
-                    pagamento: colunas[3].trim(),
-                    itensVendidos: colunas[4].replace(/"/g, "").trim(),
-                    total: parseFloat(colunas[5].replace(",", "."))
+                novos.push({
+                    id: colunas[0].trim(), data: colunas[1].trim(), local: colunas[2].trim(), pagamento: colunas[3].trim(),
+                    itensVendidos: colunas[4].replace(/"/g, "").trim(), total: parseFloat(colunas[5].replace(",", "."))
                 });
             }
         });
-
-        if (novosItensHistorico.length > 0) {
-            if(confirm(`Encontrados ${novosItensHistorico.length} pedidos. Carregar na tela?`)) {
-                historico = [...novosItensHistorico, ...historico]; 
-                atualizarHistoricoUI();
-            }
-        } else {
-            alert("Arquivo inválido!");
-        }
+        if (novos.length > 0) { historico = [...novos, ...historico]; atualizarHistoricoUI(); }
     };
     leitor.readAsText(arquivo, "UTF-8");
-    event.target.value = "";
 }
-
 function gerarRelatorioCompleto(){ 
-    alert(`Resumo atual do faturamento: R$ ${totalDia.toFixed(2)}\nPedidos no histórico: ${historico.length}`);
+    alert(`Faturamento: R$ ${totalDia.toFixed(2)}\nPedidos: ${historico.length}`);
 }
 
-// Inicialização Final
 atualizarEstoque();
 atualizarMesas();
 atualizarTotalDia();
