@@ -1,30 +1,18 @@
 /* =========================
-   CONFIGURAÇÃO INICIAL
+   VARIÁVEIS GLOBAIS
 ========================= */
-const SENHA_SISTEMA = "1234"; 
-
 let estoque = JSON.parse(localStorage.getItem("estoque")) || [];
 let comandas = JSON.parse(localStorage.getItem("comandas")) || {};
-let totalDia = JSON.parse(localStorage.getItem("totalDia")) || 0;
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
-
-/* =========================
-   INICIALIZAÇÃO DOM
-========================= */
-document.addEventListener("DOMContentLoaded", function() {
-    atualizarEstoque();
-    atualizarMesas();
-    atualizarTotalDia();
-    atualizarHistoricoUI();
-});
+let totalDia = parseFloat(localStorage.getItem("totalDia")) || 0;
 
 /* =========================
    LOGIN
 ========================= */
 function fazerLogin(){
     const senha = document.getElementById("senhaLogin").value;
-    if(senha === SENHA_SISTEMA){
-        document.getElementById("loginScreen").style.display="none";
+    if(senha === "1234"){
+        document.getElementById("loginScreen").style.display = "none";
     } else {
         alert("Senha incorreta!");
     }
@@ -36,185 +24,122 @@ function fazerLogin(){
 function salvarDados(){
     localStorage.setItem("estoque", JSON.stringify(estoque));
     localStorage.setItem("comandas", JSON.stringify(comandas));
-    localStorage.setItem("totalDia", JSON.stringify(totalDia));
     localStorage.setItem("historico", JSON.stringify(historico));
+    localStorage.setItem("totalDia", totalDia);
 }
 
 /* =========================
-   TOGGLE DELIVERY
+   TEMA
 ========================= */
-function toggleCliente(){
-    const mesaSelect = document.getElementById("mesaSelect");
-    const painel = document.getElementById("painelDelivery");
-    let mesa = mesaSelect.value;
-    painel.style.display = (mesa === "Delivery") ? "flex" : "none";
-    atualizarMesa();
+function toggleTheme(){
+    document.body.classList.toggle("light-theme");
 }
 
 /* =========================
    CADASTRAR PRODUTO
 ========================= */
 function cadastrarProduto(){
-    let nome = document.getElementById("nomeProduto").value.trim();
-    let preco = parseFloat(document.getElementById("precoProduto").value);
-    let qtd = parseInt(document.getElementById("estoqueProduto").value);
+    const nome = document.getElementById("nomeProduto").value.trim();
+    const preco = parseFloat(document.getElementById("precoProduto").value);
+    const qtd = parseInt(document.getElementById("estoqueProduto").value);
 
-    if(!nome || isNaN(preco) || preco <= 0 || isNaN(qtd) || qtd < 0)
-        return alert("Valores inválidos!");
+    if(!nome || preco <= 0 || qtd < 0){
+        return alert("Preencha corretamente!");
+    }
 
-    if(estoque.find(p => p.nome.toLowerCase() === nome.toLowerCase()))
-        return alert("Produto já cadastrado!");
-
-    estoque.push({nome, preco, qtd});
+    estoque.push({ nome, preco, qtd });
     salvarDados();
     atualizarEstoque();
-
-    document.getElementById("nomeProduto").value="";
-    document.getElementById("precoProduto").value="";
-    document.getElementById("estoqueProduto").value="";
 }
 
 /* =========================
    ATUALIZAR ESTOQUE
 ========================= */
 function atualizarEstoque(){
-    const tabelaEstoque = document.getElementById("tabelaEstoque");
-    const produtoSelect = document.getElementById("produtoSelect");
-    if(!tabelaEstoque || !produtoSelect) return;
+    const tabela = document.getElementById("tabelaEstoque");
+    const select = document.getElementById("produtoSelect");
 
-    tabelaEstoque.innerHTML="";
-    produtoSelect.innerHTML="";
+    tabela.innerHTML = "";
+    select.innerHTML = "";
 
-    estoque.forEach((p,i)=>{
-        tabelaEstoque.innerHTML+=`
-        <tr>
-            <td>${p.nome}</td>
-            <td>R$ ${p.preco.toFixed(2)}</td>
-            <td>
-                <button onclick="alterarEstoque(${i},-1)">➖</button>
-                <strong>${p.qtd}</strong>
-                <button onclick="alterarEstoque(${i},1)">➕</button>
-            </td>
-            <td>
-                <button class="btn-danger" onclick="excluirProduto(${i})">🗑️</button>
-            </td>
-        </tr>`;
+    estoque.forEach((prod, i)=>{
+        tabela.innerHTML += `
+            <tr>
+                <td>${prod.nome}</td>
+                <td>R$ ${prod.preco.toFixed(2)}</td>
+                <td>${prod.qtd}</td>
+                <td><button onclick="removerProduto(${i})">❌</button></td>
+            </tr>
+        `;
 
-        produtoSelect.innerHTML+=`<option value="${i}">${p.nome}</option>`;
+        select.innerHTML += `<option value="${i}">${prod.nome}</option>`;
     });
 }
 
-/* =========================
-   ALTERAR ESTOQUE
-========================= */
-function alterarEstoque(i,n){
-    if(estoque[i].qtd + n < 0)
-        return alert("Estoque insuficiente!");
-
-    estoque[i].qtd += n;
+function removerProduto(i){
+    estoque.splice(i,1);
     salvarDados();
     atualizarEstoque();
 }
 
 /* =========================
-   EXCLUIR PRODUTO
+   MESA SELECT
 ========================= */
-function excluirProduto(i){
-    if(confirm(`Excluir ${estoque[i].nome}?`)){
-        estoque.splice(i,1);
-        salvarDados();
-        atualizarEstoque();
-    }
+function inicializarMesas(){
+    const mesaSelect = document.getElementById("mesaSelect");
+    mesaSelect.innerHTML = `
+        <option value="todas">Selecione</option>
+        <option value="1">Mesa 1</option>
+        <option value="2">Mesa 2</option>
+        <option value="3">Mesa 3</option>
+        <option value="Balcão">Balcão</option>
+        <option value="Delivery">Delivery</option>
+    `;
+}
+
+function toggleCliente(){
+    const mesa = document.getElementById("mesaSelect").value;
+    const painel = document.getElementById("painelDelivery");
+
+    painel.style.display = mesa === "Delivery" ? "flex" : "none";
+    atualizarMesa();
 }
 
 /* =========================
-   MESAS
+   ADICIONAR ITEM
 ========================= */
-function atualizarMesas(){
-    const mesaSelect = document.getElementById("mesaSelect");
-    if(!mesaSelect) return;
+function adicionarItem(){
+    const mesaSel = document.getElementById("mesaSelect").value;
+    if(mesaSel === "todas") return alert("Selecione destino!");
 
-    mesaSelect.innerHTML=`
-        <option value="todas">Ver Todas</option>
-        <option value="Balcão">📍 Balcão</option>
-        <option value="Delivery">🛵 Delivery</option>`;
+    const prodIndex = document.getElementById("produtoSelect").value;
+    const qtd = parseInt(document.getElementById("qtdItem").value);
+    const obs = document.getElementById("obsItem").value.trim();
+    const nomeCliente = document.getElementById("nomeCliente").value.trim();
+    const taxaEntrega = parseFloat(document.getElementById("taxaEntrega").value) || 0;
 
-    for(let i=1;i<=20;i++){
-        mesaSelect.innerHTML+=`<option value="${i}">Mesa ${i}</option>`;
-    }
-}
+    let produto = estoque[prodIndex];
+    if(!produto || qtd <= 0) return alert("Quantidade inválida!");
+    if(produto.qtd < qtd) return alert("Estoque insuficiente!");
 
-/* =========================
-   ATUALIZAR MESA
-========================= */
-function atualizarMesa(){
-    const mesaSelect = document.getElementById("mesaSelect");
-    const nomeCliente = document.getElementById("nomeCliente");
-    const itensMesa = document.getElementById("itensMesa");
-    const totalMesa = document.getElementById("totalMesa");
-
-    if(!mesaSelect || !itensMesa || !totalMesa) return;
-
-    let mesaSel = mesaSelect.value;
-    let nomeCli = nomeCliente ? nomeCliente.value.trim() : "";
-
-    let idBusca =
-        (mesaSel === "Delivery") ? `DELIVERY: ${nomeCli}` :
-        (mesaSel === "Balcão") ? "BALCÃO" :
+    let id =
+        mesaSel === "Delivery" ? `DELIVERY: ${nomeCliente}` :
+        mesaSel === "Balcão" ? "BALCÃO" :
         `MESA ${mesaSel}`;
 
-    itensMesa.innerHTML="";
-    let totalGeral=0;
-
-    const renderLinhas = (id)=>{
-        let subtotal=0;
-
-        comandas[id].itens.forEach((item,index)=>{
-            subtotal+=item.total;
-
-            itensMesa.innerHTML+=`
-            <tr>
-                <td>${id}</td>
-                <td>${item.nome}</td>
-                <td>${item.obs || "-"}</td>
-                <td>${item.qtd}</td>
-                <td>R$ ${item.total.toFixed(2)}</td>
-                <td>
-                    <button class="btn-danger"
-                    onclick="removerItem('${id}',${index})">❌</button>
-                </td>
-            </tr>`;
-        });
-
-        if(comandas[id].taxa > 0){
-            subtotal += comandas[id].taxa;
-        }
-
-        return subtotal;
-    };
-
-    if(mesaSel==="todas"){
-        for(let id in comandas){
-            totalGeral+=renderLinhas(id);
-        }
-    } else if(comandas[idBusca]){
-        totalGeral=renderLinhas(idBusca);
+    if(!comandas[id]){
+        comandas[id] = { itens: [], taxa: mesaSel === "Delivery" ? taxaEntrega : 0 };
     }
 
-    totalMesa.innerHTML="Total: R$ "+totalGeral.toFixed(2);
-}
+    comandas[id].itens.push({
+        nome: produto.nome,
+        qtd,
+        preco: produto.preco,
+        total: produto.preco * qtd,
+        obs
+    });
 
-/* =========================
-   REMOVER ITEM
-========================= */
-function removerItem(id,idx){
-    let item=comandas[id].itens[idx];
-    let p=estoque.find(p=>p.nome===item.nome);
-    if(p) p.qtd+=item.qtd;
-
-    comandas[id].itens.splice(idx,1);
-    if(comandas[id].itens.length===0)
-        delete comandas[id];
+    produto.qtd -= qtd;
 
     salvarDados();
     atualizarEstoque();
@@ -222,10 +147,147 @@ function removerItem(id,idx){
 }
 
 /* =========================
-   TOTAL DIA
+   ATUALIZAR MESA
+========================= */
+function atualizarMesa(){
+    const mesaSel = document.getElementById("mesaSelect").value;
+    const tabela = document.getElementById("itensMesa");
+    const totalDiv = document.getElementById("totalMesa");
+
+    tabela.innerHTML = "";
+    totalDiv.innerHTML = "Total: R$ 0.00";
+
+    let id =
+        mesaSel === "Balcão" ? "BALCÃO" :
+        mesaSel === "Delivery" ? null :
+        `MESA ${mesaSel}`;
+
+    if(mesaSel === "Delivery"){
+        const nomeCliente = document.getElementById("nomeCliente").value.trim();
+        id = `DELIVERY: ${nomeCliente}`;
+    }
+
+    if(!id || !comandas[id]) return;
+
+    let total = 0;
+
+    comandas[id].itens.forEach((item,i)=>{
+        total += item.total;
+        tabela.innerHTML += `
+            <tr>
+                <td>${id}</td>
+                <td>${item.nome}</td>
+                <td>${item.obs}</td>
+                <td>${item.qtd}</td>
+                <td>R$ ${item.total.toFixed(2)}</td>
+                <td><button onclick="removerItem('${id}',${i})">❌</button></td>
+            </tr>
+        `;
+    });
+
+    total += comandas[id].taxa || 0;
+    totalDiv.innerHTML = "Total: R$ " + total.toFixed(2);
+}
+
+function removerItem(id,i){
+    comandas[id].itens.splice(i,1);
+    salvarDados();
+    atualizarMesa();
+}
+
+/* =========================
+   FECHAR MESA
+========================= */
+function fecharMesa(){
+    const mesaSel = document.getElementById("mesaSelect").value;
+
+    let id =
+        mesaSel === "Balcão" ? "BALCÃO" :
+        mesaSel === "Delivery" ? null :
+        `MESA ${mesaSel}`;
+
+    if(mesaSel === "Delivery"){
+        const nomeCliente = document.getElementById("nomeCliente").value.trim();
+        id = `DELIVERY: ${nomeCliente}`;
+    }
+
+    if(!id || !comandas[id]) return alert("Nenhuma comanda aberta!");
+
+    let total = comandas[id].itens.reduce((s,i)=>s+i.total,0);
+    total += comandas[id].taxa || 0;
+
+    historico.push({
+        id,
+        data: new Date().toLocaleString(),
+        total
+    });
+
+    totalDia += total;
+
+    delete comandas[id];
+
+    salvarDados();
+    atualizarMesa();
+    atualizarHistoricoUI();
+    atualizarTotalDia();
+
+    alert("Conta fechada!");
+}
+
+/* =========================
+   HISTÓRICO
+========================= */
+function atualizarHistoricoUI(){
+    const tabela = document.getElementById("tabelaHistorico");
+    tabela.innerHTML = "";
+
+    historico.forEach((h,i)=>{
+        tabela.innerHTML += `
+            <tr>
+                <td>${i+1}</td>
+                <td>${h.data}</td>
+                <td>${h.id}</td>
+                <td>-</td>
+                <td>R$ ${h.total.toFixed(2)}</td>
+                <td>-</td>
+            </tr>
+        `;
+    });
+}
+
+function limparHistoricoVisual(){
+    if(confirm("Limpar histórico?")){
+        historico = [];
+        salvarDados();
+        atualizarHistoricoUI();
+    }
+}
+
+/* =========================
+   CAIXA
 ========================= */
 function atualizarTotalDia(){
-    const el=document.getElementById("totalDia");
-    if(el)
-        el.innerHTML="Total: R$ "+totalDia.toFixed(2);
+    document.getElementById("totalDia").innerHTML =
+        "Total: R$ " + totalDia.toFixed(2);
 }
+
+function fecharCaixa(){
+    alert("Total do dia: R$ " + totalDia.toFixed(2));
+}
+
+function zerarSistema(){
+    if(confirm("Tem certeza que deseja zerar tudo?")){
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+/* =========================
+   INICIALIZAÇÃO
+========================= */
+window.onload = function(){
+    inicializarMesas();
+    atualizarEstoque();
+    atualizarHistoricoUI();
+    atualizarTotalDia();
+};
