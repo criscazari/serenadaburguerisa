@@ -47,13 +47,10 @@
 
         <div class="section" style="display: flex; gap: 10px; justify-content: center;">
             <input type="file" id="inputImportarEstoque" accept=".csv" 
-       onchange="importarCSVEstoque(event)" 
-       style="display: none;">
+             onchange="importarCSVEstoque(event)" 
+             style="display: none;">
 
-<button class="btn-primary" 
-        onclick="document.getElementById('inputImportarEstoque').click()">
-    📤 Importar Estoque
-</button>
+            <button class="btn-primary" onclick="document.getElementById('inputImportarEstoque').click()"> 📤 Importar Estoque </button>
             <button class="btn-primary" onclick="exportarEstoque()">📥 Exportar Estoque</button>
             <button class="btn-danger" onclick="zerarSistema()">⚠️ Zerar Sistema</button>
         </div>
