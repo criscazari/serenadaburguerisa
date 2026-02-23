@@ -172,7 +172,6 @@ function importarCSV(event) {
     event.target.value = "";
 }
 
-// --- IMPORTAR ESTOQUE ---
 function importarCSVEstoque(event) {
     const arquivo = event.target.files[0];
     if (!arquivo) return;
@@ -181,15 +180,20 @@ function importarCSVEstoque(event) {
 
     leitor.onload = function(e) {
         const conteudo = e.target.result;
+
+        // Remove BOM e divide linhas
         const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
 
-        let novosItens = [];
+        let novosItens = 0;
 
         linhas.forEach((linha, index) => {
 
             linha = linha.trim();
+
+            // Pula cabeçalho e linhas vazias
             if (index === 0 || linha === "") return;
 
+            // Divide respeitando texto entre aspas
             const colunas = linha.match(/(".*?"|[^;]+)/g);
 
             if (colunas && colunas.length >= 3) {
@@ -200,24 +204,30 @@ function importarCSVEstoque(event) {
 
                 if (!isNaN(preco) && !isNaN(qtd)) {
 
-                    // Se já existir, soma quantidade
+                    // Verifica se já existe no estoque
                     const existente = estoque.find(p =>
                         p.nome.toLowerCase() === nome.toLowerCase()
                     );
 
                     if (existente) {
-                        existente.qtd += qtd;
-                        existente.preco = preco;
+                        existente.qtd += qtd;   // soma quantidade
+                        existente.preco = preco; // atualiza preço
                     } else {
                         estoque.push({ nome, preco, qtd });
                     }
+
+                    novosItens++;
                 }
             }
         });
 
-        salvarDados();
-        renderizarTudo();
-        alert("Estoque importado com sucesso!");
+        if (novosItens > 0) {
+            salvarDados();
+            renderizarTudo();
+            alert("Estoque importado com sucesso!");
+        } else {
+            alert("Nenhum dado válido encontrado no arquivo!");
+        }
     };
 
     leitor.readAsText(arquivo, "UTF-8");
