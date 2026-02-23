@@ -181,8 +181,6 @@ function importarCSVEstoque(event) {
 
     leitor.onload = function(e) {
         const conteudo = e.target.result;
-
-        // Remove BOM e divide linhas
         const linhas = conteudo.replace(/\ufeff/g, "").split("\n");
 
         let novosItens = [];
@@ -190,59 +188,36 @@ function importarCSVEstoque(event) {
         linhas.forEach((linha, index) => {
 
             linha = linha.trim();
-
-            // Ignora cabeçalho ou linha vazia
             if (index === 0 || linha === "") return;
 
             const colunas = linha.match(/(".*?"|[^;]+)/g);
 
-            if (colunas && colunas.length >= 5) {
+            if (colunas && colunas.length >= 3) {
 
-                const precoConvertido = parseFloat(
-                    colunas[3].replace(",", ".").trim()
-                );
+                const nome = colunas[0].replace(/"/g, "").trim();
+                const preco = parseFloat(colunas[1].replace(",", ".").trim());
+                const qtd = parseInt(colunas[2].trim());
 
-                const quantidadeConvertida = parseInt(
-                    colunas[4].trim()
-                );
+                if (!isNaN(preco) && !isNaN(qtd)) {
 
-                if (!isNaN(precoConvertido) && !isNaN(quantidadeConvertida)) {
+                    // Se já existir, soma quantidade
+                    const existente = estoque.find(p =>
+                        p.nome.toLowerCase() === nome.toLowerCase()
+                    );
 
-                    novosItens.push({
-                        id: colunas[0].trim(),
-                        nome: colunas[1].replace(/"/g, "").trim(),
-                        categoria: colunas[2].trim(),
-                        preco: precoConvertido,
-                        quantidade: quantidadeConvertida
-                    });
-
+                    if (existente) {
+                        existente.qtd += qtd;
+                        existente.preco = preco;
+                    } else {
+                        estoque.push({ nome, preco, qtd });
+                    }
                 }
             }
         });
 
-        if (novosItens.length > 0) {
-
-            if (confirm(`Deseja importar ${novosItens.length} itens para o estoque?`)) {
-
-                // 🔎 Evita duplicação por ID
-                novosItens = novosItens.filter(novo =>
-                    !estoque.some(item => item.id === novo.id)
-                );
-
-                estoque = [...estoque, ...novosItens];
-
-                localStorage.setItem("estoque", JSON.stringify(estoque));
-
-                if (typeof renderizarEstoque === "function") {
-                    renderizarEstoque();
-                }
-
-                alert("Estoque importado com sucesso!");
-            }
-
-        } else {
-            alert("Nenhum item válido encontrado no arquivo!");
-        }
+        salvarDados();
+        renderizarTudo();
+        alert("Estoque importado com sucesso!");
     };
 
     leitor.readAsText(arquivo, "UTF-8");
