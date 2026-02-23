@@ -148,6 +148,47 @@ function fecharMesa(){
     renderizarTudo();
 }
 
+// --- FECHAMENTO DE CAIXA COM GERAÇÃO DE CSV ---
+function fecharCaixa(){
+    if(totalDia === 0 && historico.length === 0) return alert("Não há vendas registradas para encerrar o caixa.");
+
+    if(confirm(`Deseja encerrar o caixa e gerar o relatório de vendas?\nTotal acumulado: R$ ${totalDia.toFixed(2)}`)) {
+        
+        // Cabeçalho do CSV
+        let csvContent = "Pedido ID;Data;Local;Pagamento;Itens;Total (R$)\n";
+        
+        // Linhas do histórico
+        historico.forEach(h => {
+            let totalFormatado = h.total.toFixed(2).replace('.', ',');
+            // Envolvemos os itens em aspas para não quebrar com a vírgula/ponto e vírgula
+            csvContent += `${h.id};${h.data};${h.local};${h.pagamento};"${h.itensVendidos}";${totalFormatado}\n`;
+        });
+        
+        // Rodapé com total
+        csvContent += `\n; ; ; ;TOTAL DO DIA;${totalDia.toFixed(2).replace('.', ',')}`;
+
+        // Criação do arquivo para download (BOM + Conteúdo)
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        const dataArquivo = new Date().toLocaleDateString().replace(/\//g, '-');
+
+        link.setAttribute("href", url);
+        link.setAttribute("download", `vendas_serenada_${dataArquivo}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Limpa faturamento e histórico após download
+        totalDia = 0;
+        historico = [];
+        salvarDados();
+        renderizarTudo();
+        
+        alert("Caixa encerrado e arquivo CSV gerado com sucesso!");
+    }
+}
+
 // --- RENDERIZAÇÃO INTERFACE ---
 function renderizarTudo() {
     atualizarEstoqueUI();
@@ -274,18 +315,6 @@ function imprimirCupom(idPedido, idLocal, obj, total, formaPag){
     janela.document.write(cupom);
     janela.document.close();
     setTimeout(() => { janela.print(); janela.close(); }, 500);
-}
-
-function fecharCaixa(){
-    if(totalDia === 0) return alert("Não há vendas para encerrar o caixa.");
-    if(confirm(`Deseja encerrar o caixa com R$ ${totalDia.toFixed(2)}?`)){
-        // Aqui você pode adicionar a lógica de gerar CSV se desejar
-        totalDia = 0;
-        historico = [];
-        salvarDados();
-        renderizarTudo();
-        alert("Caixa encerrado com sucesso!");
-    }
 }
 
 function zerarSistema() {
