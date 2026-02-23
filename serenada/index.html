@@ -1,135 +1,122 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Serenada Pub & Burger - PDV</title>
+<title>Serenada Pub & Burger - Sistema</title>
 <link rel="icon" type="image/png" href="hamburger.png">
 <link rel="stylesheet" href="style.css">
 </head>
-<!-- ================= LOGIN ================= -->
-<div id="loginScreen" class="login-screen">
-    <div class="login-box">
-        <h2>🔐 Acesso ao Sistema</h2>
-        <input type="password" id="senhaLogin" placeholder="Digite a senha">
-        <button onclick="fazerLogin()" class="btn-primary">Entrar</button>
-    </div>
-</div>
 <body>
 
-
-
-<button class="theme-toggle" onclick="toggleTheme()">🌗 Tema</button>
+<div id="loginScreen" class="login-screen">
+    <h2>🍔 Serenada Pub - Acesso</h2>
+    <input type="password" id="senhaLogin" placeholder="Senha do Sistema"
+        onkeydown="if(event.key === 'Enter'){ fazerLogin();}">
+    <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
+</div>
 
 <div class="container">
 
-    <!-- LOGO -->
-    <div class="logo-container">
-        <img src="hamburger.png" alt="Logo">
-        <h1>Serenada Pub & Burger 🍔</h1>
-    </div>
+<header class="logo-container">
+    <img src="icon-192.png" alt="Logo">
+    <h1>.:SERENADA PUB & BURGER:.</h1>
+    <div></div>
+</header>
 
-    <!-- ================= CADASTRO PRODUTO ================= -->
-    <div class="section">
-        <h2>📦 Cadastro de Produto</h2>
-        <input type="text" id="nomeProduto" placeholder="Nome">
-        <input type="number" id="precoProduto" placeholder="Preço">
-        <input type="number" id="estoqueProduto" placeholder="Quantidade em estoque">
-        <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
-    </div>
+<div class="section">
+    <h3>📦 Cadastro de Estoque</h3>
+    <input id="nomeProduto" placeholder="Nome do Produto">
+    <input id="precoProduto" type="number" step="0.01" min="0.01" placeholder="Preço (ex: 25.50)">
+    <input id="estoqueProduto" type="number" min="0" placeholder="Qtd Inicial">
+    <button class="btn-primary" onclick="cadastrarProduto()">Cadastrar</button>
 
-    <!-- ================= ESTOQUE ================= -->
-    <div class="section">
-        <h2>📊 Estoque</h2>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Produto</th>
-                        <th>Preço</th>
-                        <th>Qtd</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaEstoque"></tbody>
-            </table>
-        </div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Preço</th>
+                <th>Estoque</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="tabelaEstoque"></tbody>
+    </table>
+</div>
 
-    <!-- ================= COMANDAS ================= -->
-    <div class="section">
-        <h2>🧾 Comandas</h2>
+<div class="section">
+    <h3>🔥 Lançar Pedido</h3>
 
+    <div class="pedido-topo">
         <select id="mesaSelect" onchange="toggleCliente()"></select>
 
-        <!-- DELIVERY -->
-        <div id="painelDelivery" style="display:none; gap:10px; margin-top:10px;">
-            <input type="text" id="nomeCliente" placeholder="Nome do cliente">
-            <input type="text" id="endCliente" placeholder="Endereço">
-            <input type="number" id="taxaEntrega" placeholder="Taxa de entrega">
+        <div id="painelDelivery">
+            <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+            <input type="text" id="endCliente" placeholder="Endereço Completo">
+            <input type="number" id="taxaEntrega" placeholder="Taxa Entrega R$" min="0" step="0.50">
         </div>
+    </div>
 
+    <div class="pedido-produto">
         <select id="produtoSelect"></select>
-        <input type="number" id="qtdItem" placeholder="Quantidade">
-        <input type="text" id="obsItem" placeholder="Observação">
-        <button class="btn-primary" onclick="adicionarItem()">Adicionar Item</button>
-
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Local</th>
-                        <th>Produto</th>
-                        <th>Obs</th>
-                        <th>Qtd</th>
-                        <th>Total</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="itensMesa"></tbody>
-            </table>
-        </div>
-
-        <div id="totalMesa" class="total">Total: R$ 0.00</div>
-
-        <button class="btn-warning" onclick="fecharMesa()">💰 Fechar Conta</button>
+        <input type="number" id="qtdItem" value="1" min="1">
+        <input type="text" id="obsItem" placeholder="Obs: Sem cebola, mal passado...">
+        <button class="btn-primary" onclick="adicionarItem()">Adicionar na Conta</button>
     </div>
 
-    <!-- ================= HISTÓRICO ================= -->
-    <div class="section">
-        <h2>📜 Histórico de Vendas</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Local/Cliente</th>
+                <th>Produto</th>
+                <th>Obs</th>
+                <th>Qtd</th>
+                <th>Total</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="itensMesa"></tbody>
+    </table>
 
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Data</th>
-                        <th>Local</th>
-                        <th>Pagamento</th>
-                        <th>Total</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaHistorico"></tbody>
-            </table>
-        </div>
+    <div class="total" id="totalMesa">Total: R$ 0.00</div>
+    <button class="btn-close" onclick="fecharMesa()">Finalizar e Imprimir Cupom</button>
+</div>
 
-        <button class="btn-danger" onclick="limparHistoricoVisual()">🗑️ Limpar Visual</button>
-        <button class="btn-primary" onclick="fecharCaixa()">📁 Fechar Caixa</button>
-        <input type="file" accept=".csv" onchange="importarCSV(event)">
+<div class="section caixa-section">
+    <div>
+        <h3>💰 Caixa do Dia</h3>
+        <div id="totalDia">Total: R$ 0.00</div>
     </div>
-
-    <!-- ================= CAIXA ================= -->
-    <div class="section">
-        <h2>💵 Caixa do Dia</h2>
-        <div id="totalDia" class="total">Total: R$ 0.00</div>
-        <button class="btn-danger" onclick="zerarSistema()">⚠️ Zerar Sistema</button>
+    <div>
+        <button class="btn-primary" onclick="gerarRelatorioCompleto()">📊 Relatório</button>
+        <button class="btn-danger" onclick="fecharCaixa()">Encerrar Caixa</button>
+        <button class="btn-warning" onclick="zerarSistema()">⚠️ Zerar Tudo</button>
+        <button class="btn-gray" onclick="limparHistoricoVisual()">🧹 Limpar Histórico</button>
+        <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
+        <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
     </div>
+</div>
+
+<div class="section">
+    <h3>📜 Histórico de Comandas Fechadas</h3>
+    <div class="historico-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Data/Hora</th>
+                    <th>Cliente/Mesa</th>
+                    <th>Pagamento</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaHistorico"></tbody>
+        </table>
+    </div>
+</div>
 
 </div>
 
 <script src="script.js"></script>
-
 </body>
 </html>
