@@ -80,6 +80,8 @@
                     <tbody id="tabelaHistorico"></tbody>
                 </table>
             </div>
+            <button class="btn-warning" onclick="document.getElementById('inputCSV').click()">📂 Importar CSV</button>
+            <input type="file" id="inputCSV" accept=".csv" style="display:none" onchange="importarCSV(event)">
             <button class="btn-gray" style="margin-top:10px" onclick="limparHistoricoVisual()">🧹 Limpar Lista</button>
         </div>
     </div>
