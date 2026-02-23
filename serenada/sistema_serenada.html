@@ -22,23 +22,8 @@ body{
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
-/* NOVO LAYOUT DO CABEÇALHO */
-.logo-container {
-    display: grid;
-    grid-template-columns: 100px 1fr 100px; /* Coluna logo, centro flexível, coluna equilíbrio */
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.logo-container img {
-    width: 100px;
-    grid-column: 1;
-}
-
-.logo-container h1 {
-    grid-column: 2;
-    text-align: center;
-    margin: 0;
+h1{
+    text-align:center;
     color: #03dac6;
     letter-spacing: 2px;
 }
@@ -119,6 +104,17 @@ th { background: #333; color: #03dac6; }
     color: #ccc;
 }
 
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-container img {
+    width: 100px;
+}
+
+/* Estilo para o botão de reimpressão pequeno */
 .btn-reprint {
     padding: 5px 10px;
     font-size: 1.2em;
@@ -136,10 +132,10 @@ th { background: #333; color: #03dac6; }
 </div>
 
 <div class="container">
-    <header class="logo-container">
+    <div class="logo-container">
         <img src="icon-192.png" alt="Logo">
         <h1>.:SERENADA PUB & BURGER:.</h1>
-        <div style="width: 100px;"></div> </header>
+    </div>
 
     <div class="section">
         <h3>📦 Cadastro de Estoque</h3>
@@ -377,6 +373,7 @@ function fecharMesa(){
     let pedidoID = "#" + Date.now().toString().slice(-6);
     let resumoItens = comandas[idBusca].itens.map(i => `${i.qtd}x ${i.nome}`).join(", ");
     
+    // NOVIDADE: Salvando o objeto completo para permitir reimpressão futura
     historico.push({ 
         id: pedidoID, 
         data: new Date().toLocaleString(), 
